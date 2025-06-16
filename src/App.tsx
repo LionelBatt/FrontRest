@@ -22,7 +22,7 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/account" element={<AccParam />} />
             <Route path="/signup" element={<CreateAcc />} />
-            <Route path="/trip" element={<FicheVoyage />} />
+            <Route path="/trip/:id" element={<FicheVoyage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/resetpwd" element={<ResetPwd />} />
             <Route path="/setpwd" element={<SetPwd />} />

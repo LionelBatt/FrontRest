@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [inputs, setInputs] = useState({});
-    const [user, setUser] = useState();
     const navigate = useNavigate();
     const handleChange = (event) => {
         const name = event.target.name;
