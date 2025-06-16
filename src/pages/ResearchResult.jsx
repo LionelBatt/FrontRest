@@ -1,22 +1,25 @@
-
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const ResearchResult = () => {
     const location = useLocation();
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const params = new URLSearchParams(location.search);
+    const [selectedContinent, setSelectedContinent] = useState(params.get("continent"));
+    const [selectedCountry, setSelectedCountry] = useState(params.get("country"));
+    const [selectedCity, setSelectedCity] = useState(params.get("city"));
+    const [selectedMinPrice, setSelectedMinPrice] = useState(params.get("minprice"));
+    const [selectedMaxPrice, setSelectedMaxPrice] = useState(params.get("maxprice"));
+    const [selectedOpt1, setSelectedOpt1] = useState(params.get("opt1"));
+    const [selectedOpt2, setSelectedOpt2] = useState(params.get("opt2"));
+    const [selectedOpt3, setSelectedOpt3] = useState(params.get("opt3"));
+    const [minimumDuration, setMinimumDuration] = useState(params.get("mindur"));
+    const [maximumDuration, setMaximumDuration] = useState(params.get("maxdur"));
+
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const [selectedContinent, setSelectedContinent] = useState(params.get("continent"));
-        const [selectedCountry, setSelectedCountry] = useState(params.get("country"));
-        const [selectedCity, setSelectedCity] = useState(params.get("city"));
-        const [selectedMinPrice, setSelectedMinPrice] = useState(params.get("minprice"));
-        const [selectedMaxPrice, setSelectedMaxPrice] = useState(params.get("maxprice"));
-        const [selectedOpt1, setSelectedOpt1] = useState(params.get("opt1"));
-        const [selectedOpt2, setSelectedOpt2] = useState(params.get("opt2"));
-        const [selectedOpt3, setSelectedOpt3] = useState(params.get("opt3"));
-        const [minimumDuration, setMinimumDuration] = useState(params.get("mindur"));
-        const [maximumDuration, setMaximumDuration] = useState(params.get("maxdur"));
+
 
         let apiUrl = `http://localhost:8080/travel/search/`;
 
