@@ -14,7 +14,32 @@ const Login = () => {
         event.preventDefault();
         console.log(inputs);
 
-        fetch("http://localhost:8080/travel/login", {
+        // fetch("http://localhost:8080/travel/login", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         username: inputs.login,
+        //         password: inputs.pwd
+        //     })
+        // })
+            // .then(res => res.json())
+            // .then(data => {
+            //     if (data.success) {
+            //         // Stockage du token
+            //         localStorage.setItem("token", data.token);
+
+            //         // Stocke l'utilisateur (ex: dans un state global, context, etc.)
+            //         setUser(data.data);
+
+            //         console.log("Connexion réussie :", data);
+            //     } else {
+            //         alert("Erreur de connexion : " + data.message || data.error);
+            //     }
+            // })
+            // .catch(err => console.error("Erreur lors de la connexion :", err));
+        fetch("http://localhost:8080/travel/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -28,10 +53,7 @@ const Login = () => {
             .then(data => {
                 if (data.success) {
                     // Stockage du token
-                    localStorage.setItem("token", data.token);
-
-                    // Stocke l'utilisateur (ex: dans un state global, context, etc.)
-                    setUser(data.data);
+                    localStorage.setItem("token", data.data);
 
                     console.log("Connexion réussie :", data);
                 } else {
@@ -40,7 +62,7 @@ const Login = () => {
             })
             .catch(err => console.error("Erreur lors de la connexion :", err));
 
-            // Envoyer les info user vers la page Home
+        // Envoyer les info user vers la page Home
         <>
             <Home />
         </>
@@ -99,7 +121,9 @@ const Login = () => {
                 <br />
 
                 <div>
-                    <a href="create.html" class="no-underline">Pas de compte ? Inscrivez-vous</a>
+                    <Link to="/createacc" >
+                        Pas de compte ? Inscrivez-vous
+                    </Link>
                 </div>
             </div>
         </div>
