@@ -44,67 +44,64 @@ const Login = () => {
         navigate(`/`);
     }
     return (
-        <div className="container mt-3" style={{ textAlign: "center" }}>
-            <br />
-            <br />
-            <br />
-            <div className="mx-auto" style={{ maxWidth: "400px" }}>
-                <h2>Identifiez-vous</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3 mt-3">
-                        <label for="login">Login:</label>
-                        <input
-                            type="text"
-                            className="form-control w-100"
-                            id="login"
-                            placeholder="Enter login"
-                            name="login"
-                            size="1"
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label for="pwd">Password:</label>
-                        <input
-                            type="password"
-                            className="form-control w-100"
-                            id="pwd"
-                            placeholder="Enter password"
-                            name="pwd"
-                            onChange={handleChange}
-                        />
-                    </div>
-                    <div>
-                        <Link to="/resetpwd" >
-                            Mots de passe oublié ?
-                        </Link>
-                    </div>
-                    <br />
-                    <div className="form-check">
+        <>
+            <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+                <div className="border rounded p-4 shadow" style={{ maxWidth: "400px", width: "100%" }}>
+                    <h2 className="text-center mb-4">Identifiez-vous</h2>
 
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            name="remember"
-                            onChange={handleChange}
-                        />
-                        <label className="form-check-label">Remember me
-                        </label>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label htmlFor="login" className="form-label">Login:</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="login"
+                                placeholder="Enter login"
+                                name="login"
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="pwd" className="form-label">Password:</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="pwd"
+                                placeholder="Enter password"
+                                name="pwd"
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="mb-3 text-end">
+                            <Link to="/resetpwd">Mot de passe oublié ?</Link>
+                        </div>
+
+                        <div className="form-check mb-3">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name="remember"
+                                id="remember"
+                                onChange={handleChange}
+                            />
+                            <label className="form-check-label" htmlFor="remember">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <div className="d-grid mb-3">
+                            <button type="submit" className="btn btn-primary">Connexion</button>
+                        </div>
+                    </form>
+
+                    <div className="text-center">
+                        <Link to="/createacc">Pas de compte ? Inscrivez-vous</Link>
                     </div>
-                    <br />
-                    <button type="submit" className="btn btn-primary">Connexion</button>
-                </form>
-
-                <br />
-
-                <div>
-                    <Link to="/createacc" >
-                        Pas de compte ? Inscrivez-vous
-                    </Link>
                 </div>
             </div>
-        </div>
-
+        </>
     )
 }
 
