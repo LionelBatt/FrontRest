@@ -41,7 +41,7 @@ const Login = () => {
             .catch(err => console.error("Erreur lors de la connexion :", err));
 
         // Envoyer les info user vers la page Home
-        navigate(`/home}`);
+        navigate(`/`);
     }
     return (
         <div className="container mt-3" style={{ textAlign: "center" }}>

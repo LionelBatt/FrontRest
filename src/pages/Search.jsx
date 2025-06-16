@@ -28,16 +28,44 @@ const Search = () => {
     const [options, setOptions] = useState();
     const navigate = useNavigate();
     useEffect(() => {
-        fetch("http://localhost:8080/travel/destination/continents")
-            .then(res => res.json())
+        const token = localStorage.getItem("token");
+        fetch("http://localhost:8080/travel/destination/continents", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
-        fetch("http://localhost:8080/travel/destination/countries")
-            .then(res => res.json())
+        fetch("http://localhost:8080/travel/destination/countries", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => setCountry(data))
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://localhost:8080/travel/destination/cities")
-            .then(res => res.json())
+        fetch("http://localhost:8080/travel/destination/cities", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
     }, []);
@@ -59,7 +87,7 @@ const Search = () => {
         navigate(`/searchresult?${params.toString()}`);
     };
     return (
-        <div className="container">
+        <div className="container" style={{ textAlign: "center" }}>
             <h1 className="text-center mb-4">Voyages</h1>
 
             {/* <!-- Carousel --> */}
@@ -213,7 +241,8 @@ const Search = () => {
                         {price} €
                     </output>
                 </div>
-                <button type="submit" class="btn btn-primary">Rechercher</button>
+                <br />
+                <button type="submit" className="btn btn-primary">Rechercher</button>
             </form>
         </div>
     )
