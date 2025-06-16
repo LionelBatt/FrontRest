@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Dropdown } from 'react-bootstrap';
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const continents = [
     { name: 'Asie', id: 'asie' },
@@ -27,6 +28,7 @@ const Search = () => {
     const [country, setCountry] = useState();
     const [city, setCity] = useState();
     const [options, setOptions] = useState();
+    const navigate = useNavigate();
     useEffect(() => {
         fetch("http://localhost:8080/travel/destination/continents")
             .then(res => res.json())
@@ -42,7 +44,7 @@ const Search = () => {
             .catch(err => console.error("Erreur de chargement des villes", err));
     }, []);
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
         const params = new URLSearchParams();
