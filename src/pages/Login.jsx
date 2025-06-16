@@ -39,7 +39,7 @@ const Login = () => {
             //     }
             // })
             // .catch(err => console.error("Erreur lors de la connexion :", err));
-        fetch("http://localhost:8080/travel/signin", {
+        fetch("http://localhost:8080/travel/auth/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
