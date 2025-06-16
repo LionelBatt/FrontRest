@@ -53,7 +53,10 @@ const Search = () => {
                 }
                 return res.json();
             })
-            .then(data => setCountry(data))
+            .then(data => {
+                console.log("Pays reçus :", data); // <-- Ajoute ceci
+                setCountry(data);
+            })
             .catch(err => console.error("Erreur de chargement des pays", err));
         fetch("http://localhost:8080/travel/destination/cities", {
             headers: {
@@ -191,7 +194,7 @@ const Search = () => {
                                 Choisissez un pays
                             </option>
                             {country
-                                ?.filter((c) => Math.floor(c.id / 100) === Number(selectedContinent))
+                                ?.filter((c) => Math.floor(c.id / 10) === Number(selectedContinent))
                                 .map((pays) => (
                                     <option key={pays.id} value={pays.id}>
                                         {pays.name}
