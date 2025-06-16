@@ -73,7 +73,7 @@ const Search = () => {
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
 
-        handleSubmit;
+        handleSubmit();
 
 
     }, []);
