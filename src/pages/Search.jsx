@@ -9,16 +9,16 @@ const Search = () => {
     const [loading, setLoading] = useState(true);
 
     const params = new URLSearchParams(location.search);
-    const [selectedContinent, setSelectedContinent] = useState(params.get("continent"));
-    const [selectedCountry, setSelectedCountry] = useState(params.get("country"));
-    const [selectedCity, setSelectedCity] = useState(params.get("city"));
-    const [selectedMinPrice, setSelectedMinPrice] = useState(params.get("minprice"));
-    const [selectedMaxPrice, setSelectedMaxPrice] = useState(params.get("maxprice"));
-    const [selectedOpt1, setSelectedOpt1] = useState(params.get("opt1"));
-    const [selectedOpt2, setSelectedOpt2] = useState(params.get("opt2"));
-    const [selectedOpt3, setSelectedOpt3] = useState(params.get("opt3"));
-    const [minimumDuration, setMinimumDuration] = useState(params.get("mindur"));
-    const [maximumDuration, setMaximumDuration] = useState(params.get("maxdur"));
+    const [selectedContinent, setSelectedContinent] = useState(params.get("continent") || "null");
+    const [selectedCountry, setSelectedCountry] = useState(params.get("country") || "null");
+    const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
+    const [selectedMinPrice, setSelectedMinPrice] = useState(1);
+    const [selectedMaxPrice, setSelectedMaxPrice] = useState(9999999);
+    const [selectedOpt1, setSelectedOpt1] = useState(-1);
+    const [selectedOpt2, setSelectedOpt2] = useState(-1);
+    const [selectedOpt3, setSelectedOpt3] = useState(-1);
+    const [minimumDuration, setMinimumDuration] = useState(1);
+    const [maximumDuration, setMaximumDuration] = useState(9999);
 
 
     const [price, setPrice] = useState(2500);
@@ -69,7 +69,7 @@ const Search = () => {
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
 
-        let apiUrl = `http://localhost:8080/travel/search/`;
+        let apiUrl = `http://15.188.48.92:8080/travel/trips/search/`;
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
