@@ -30,11 +30,7 @@ const Search = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        fetch("http://localhost:8080/travel/destination/continents", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        fetch("http://localhost:8080/travel/destination/continents")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -43,11 +39,7 @@ const Search = () => {
             })
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
-        fetch("http://localhost:8080/travel/destination/countries", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        fetch("http://localhost:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -59,11 +51,7 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://localhost:8080/travel/destination/cities", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        fetch("http://localhost:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -78,8 +66,8 @@ const Search = () => {
 
     }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        if (event) event.preventDefault();
 
         let apiUrl = `http://localhost:8080/travel/search/`;
 
@@ -110,7 +98,6 @@ const Search = () => {
     };
 
     if (loading) return <p>Chargement...</p>;
-    if (!trips.length) return <p>Aucun résultat trouvé.</p>;
     return (
         <>
             <div className="container" style={{ textAlign: "center" }}>
@@ -272,16 +259,17 @@ const Search = () => {
                 </form>
             </div>
 
+            {trips.length &&
+                <div className="container">
+                    <h1 className="text-center mb-5 text-primary">Résultat de Recherche</h1>
 
-            <div class="container">
-                <h1 class="text-center mb-5 text-primary">Résultat de Recherche</h1>
-
-                <ul>
-                    {trips.map(trip => (
-                        <li key={trip.id}>{trip.name}</li>
-                    ))}
-                </ul>
-            </div>
+                    <ul>
+                        {trips.map(trip => (
+                            <li key={trip.id}>{trip.name}</li>
+                        ))}
+                    </ul>
+                </div>
+            }
         </>
     )
 }
