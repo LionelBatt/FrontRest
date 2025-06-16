@@ -1,25 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from './components/Layout';
+import Search from './pages/Search';
+import Home from './pages/Home';
+import AccParam from './pages/AccParam';
+import CreateAcc from './pages/CreateAcc';
+import FicheVoyage from './pages/FicheVoyage';
+import Login from './pages/Login';
+import ResetPwd from './pages/ResetPwd';
+import SetPwd from './pages/SetPwd';
+import VerifCode from './pages/VerifCode';
+import ResearchResult from './pages/ResearchResult';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/account" element={<AccParam />} />
+            <Route path="/signup" element={<CreateAcc />} />
+            <Route path="/trip" element={<FicheVoyage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/resetpwd" element={<ResetPwd />} />
+            <Route path="/setpwd" element={<SetPwd />} />
+            <Route path="/verification" element={<VerifCode />} />
+            <Route path="/searchresult" element={<ResearchResult />} />
+          </Route>
+        </Routes>
+
+      </BrowserRouter>
+    </>
   );
 }
 
