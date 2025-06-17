@@ -39,7 +39,8 @@ const Search = () => {
             })
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
-        fetch("http://localhost:8080/travel/destination/countries")
+        
+      fetch("http://15.188.48.92:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -51,7 +52,8 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://localhost:8080/travel/destination/cities")
+
+        fetch("http://15.188.48.92:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -69,7 +71,7 @@ const Search = () => {
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
 
-        let apiUrl = `http://15.188.48.92:8080/travel/trips/search/`;
+        let apiUrl = `http://15.188.48.92:8080/travel/trips/filter/';
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
