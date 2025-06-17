@@ -48,3 +48,66 @@
   padding: 10px;
   border-radius: 5px;
 }
+
+.glass-top-bar {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #222;
+}
+
+.glass-block {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  min-width: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.glass-continent-btn,
+.glass-country-btn,
+.glass-city-btn {
+  background: transparent;
+  color: #222;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.glass-continent-btn:hover,
+.glass-country-btn:hover,
+.glass-city-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+}
+
+.glass-city-btn.active {
+  background-color: rgba(0, 123, 255, 0.15);
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.glass-continent-btn svg,
+.glass-country-btn svg,
+.glass-city-btn svg {
+  color: #444;
+}
+
+.glass-range {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  position: relative;
+}
+
+.glass-thumb {
+  height: 16px;
+  width: 16px;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  margin-top: -5px;
+}
