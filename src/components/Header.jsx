@@ -1,37 +1,106 @@
 import { Link } from "react-router-dom";
 import { Globe } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import '../styles/glassmorphism.css';
 
 const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Vérifier si l'utilisateur est connecté au chargement du composant
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    // Vérifier au chargement
+    checkLoginStatus();
+
+    // Écouter les événements personnalisés
+    const handleLoginChange = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('loginStatusChanged', handleLoginChange);
+    window.addEventListener('storage', handleLoginChange);
+
+    return () => {
+      window.removeEventListener('loginStatusChanged', handleLoginChange);
+      window.removeEventListener('storage', handleLoginChange);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    const token = localStorage.getItem("token");
+    
+    if (token) {
+      fetch("http://15.188.48.92:8080/travel/auth/signout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Déconnexion réussie :", data);
+      })
+      .catch(err => console.error("Erreur lors de la déconnexion :", err))
+      .finally(() => {
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+        console.log("Token supprimé et utilisateur déconnecté");
+        
+        // Déclencher l'événement personnalisé
+        window.dispatchEvent(new Event('loginStatusChanged'));
+        
+        window.location.href = "/";
+      });
+    }
+  };
   return (
     <header>
-      <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <nav className="navbar navbar-expand-md fixed-top glass-navbar">
         <div className="container-fluid">
 
-          {/* Bouton Globe (ouvre la sidebar) */}
+          {/* Bouton Globe avec couleur noire */}
           <button
             onClick={onMenuClick}
             onMouseEnter={() => {
-              console.log('Globe button mouse enter'); // Debug
+              console.log('Globe button mouse enter');
               if (onMenuMouseEnter) onMenuMouseEnter();
             }}
             onMouseLeave={() => {
-              console.log('Globe button mouse leave'); // Debug  
+              console.log('Globe button mouse leave');
               if (onMenuMouseLeave) onMenuMouseLeave();
             }}
-            className="btn btn-outline-light me-3 d-flex align-items-center justify-content-center"
-            style={{ border: 'none', padding: '0.5rem', fontSize: '1.2rem' }}
+            className="glass-btn glass-border-radius-lg me-3 d-flex align-items-center justify-content-center"
+            style={{ 
+              padding: '0.6rem',
+              fontSize: '1.2rem',
+              color: 'black', /* Couleur noire explicite */
+            }}
             title="Destinations"
           >
             <Globe size={20} /> 
           </button>
 
-          <Link to="/" className="navbar-brand">
+          <Link 
+            to="/" 
+            className="navbar-brand"
+            style={{
+              fontWeight: '600',
+              textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+              textDecoration: 'none',
+              color: 'black', /* Texte en noir comme demandé */
+            }}
+          >
             Agence de Voyage ✈
           </Link>
 
-          {/* Bouton Bootstrap classique pour collapse (utile mobile) */}
+          {/* Bouton Bootstrap avec style glassmorphism */}
           <button
-            className="navbar-toggler"
+            className="navbar-toggler glass-btn glass-border-radius"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#navbarCollapse"
@@ -39,48 +108,57 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <span className="navbar-toggler-icon"></span>
+            <span 
+              className="navbar-toggler-icon"
+              style={{
+                filter: 'brightness(0)', /* Hamburger en noir */
+              }}
+            ></span>
           </button>
 
           <div className="collapse navbar-collapse" id="navbarCollapse">
-            <ul className="navbar-nav me-auto mb-2 mb-md-0">
-              {/* Changer les IDs pour éviter les collisions */}
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" id="menuAmerique" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Amérique
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="menuAmerique">
-                  <li><a className="dropdown-item" href="#">New-york</a></li>
-                  <li><a className="dropdown-item" href="#">Montreal</a></li>
-                  <li><a className="dropdown-item" href="#">Rio</a></li>
-                </ul>
-              </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" id="menuEurope" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Europe
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="menuEurope">
-                  <li><a className="dropdown-item" href="#">Paris</a></li>
-                  <li><a className="dropdown-item" href="#">Rome</a></li>
-                  <li><a className="dropdown-item" href="#">Madrid</a></li>
-                </ul>
-              </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" id="menuAsie" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Asie
-                </a>
-                <ul className="dropdown-menu" aria-labelledby="menuAsie">
-                  <li><a className="dropdown-item" href="#">Beijing</a></li>
-                  <li><a className="dropdown-item" href="#">Seoul</a></li>
-                  <li><a className="dropdown-item" href="fiche-Tokyo.html">Tokyo</a></li>
-                </ul>
-              </li>
-            </ul>
-
-            <form className="d-flex">
-              <Link to="/search" className="btn btn-success me-2" role="button">Rechercher</Link>
-              <Link to="/login" className="btn btn-primary me-2" role="button">Se connecter</Link>
-              <Link to="/param" className="btn btn-danger" role="button">Param</Link>
+            <form className="d-flex ms-auto gap-2">
+              <Link 
+                to="/search" 
+                className="btn glass-btn-success glass-border-radius-lg glass-text-white" 
+                role="button"
+                style={{
+                  fontWeight: '500',
+                  padding: '0.5rem 1rem',
+                  textDecoration: 'none',
+                }}
+              >
+                Rechercher
+              </Link>
+              
+              {isLoggedIn ? (
+                <button 
+                  onClick={handleLogout}
+                  className="btn glass-btn-danger glass-border-radius-lg glass-text-white" 
+                  style={{
+                    fontWeight: '500',
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    border: 'none',
+                  }}
+                >
+                  Se déconnecter
+                </button>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className="btn glass-btn-primary glass-border-radius-lg glass-text-white" 
+                  role="button"
+                  style={{
+                    fontWeight: '500',
+                    padding: '0.5rem 1rem',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Se connecter
+                </Link>
+              )}
             </form>
           </div>
         </div>

@@ -10,7 +10,6 @@ import Login from './pages/Login';
 import ResetPwd from './pages/ResetPwd';
 import SetPwd from './pages/SetPwd';
 import VerifCode from './pages/VerifCode';
-import ResearchResult from './pages/ResearchResult';
 
 function App() {
   return (
@@ -22,12 +21,11 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/account" element={<AccParam />} />
             <Route path="/signup" element={<CreateAcc />} />
-            <Route path="/trip" element={<FicheVoyage />} />
+            <Route path="/trip/:id" element={<FicheVoyage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/resetpwd" element={<ResetPwd />} />
             <Route path="/setpwd" element={<SetPwd />} />
             <Route path="/verification" element={<VerifCode />} />
-            <Route path="/searchresult" element={<ResearchResult />} />
           </Route>
         </Routes>
 

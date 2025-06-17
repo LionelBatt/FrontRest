@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [inputs, setInputs] = useState({});
-    const [user, setUser] = useState();
     const navigate = useNavigate();
     const handleChange = (event) => {
         const name = event.target.name;
@@ -16,7 +15,7 @@ const Login = () => {
         event.preventDefault();
         console.log(inputs);
 
-        fetch("http://localhost:8080/travel/auth/signin", {
+        fetch("http://15.188.48.92:8080/travel/auth/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -33,14 +32,15 @@ const Login = () => {
                     localStorage.setItem("token", data.data);
 
                     console.log("Connexion réussie :", data);
+                    
+                    window.dispatchEvent(new Event('loginStatusChanged'));
+                    
+                    navigate(`/`);
                 } else {
                     alert("Erreur de connexion : " + data.message || data.error);
                 }
             })
             .catch(err => console.error("Erreur lors de la connexion :", err));
-
-        // Envoyer les info user vers la page Home
-        navigate(`/`);
     }
     return (
         <>

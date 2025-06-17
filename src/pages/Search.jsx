@@ -43,7 +43,7 @@ const Search = () => {
             })
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
-        fetch("http://localhost:8080/travel/destination/countries", {
+        fetch("http://15.188.48.92:8080/travel/destination/countries", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -59,7 +59,7 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://localhost:8080/travel/destination/cities", {
+        fetch("http://15.188.48.92:8080/travel/destination/cities", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -73,7 +73,7 @@ const Search = () => {
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
 
-        handleSubmit;
+        handleSubmit();
 
 
     }, []);
@@ -81,7 +81,7 @@ const Search = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        let apiUrl = `http://localhost:8080/travel/search/`;
+        let apiUrl = `http://15.188.48.92:8080/travel/search/`;
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
