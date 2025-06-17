@@ -15,7 +15,7 @@ const FicheVoyage = () => {
     const [showAllOptions, setShowAllOptions] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState({});
 
-    // 🎯 Fonction pour attendre que Bootstrap soit chargé puis contrôler le carousel
+    //Fonction pour attendre que Bootstrap soit chargé puis contrôler le carousel
     const goToSlide = (slideIndex) => {
         const waitForBootstrap = () => {
             if (window.bootstrap && window.bootstrap.Carousel) {

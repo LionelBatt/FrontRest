@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
+import LoadingBar from "../components/LoadingBar";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,6 +75,7 @@ const Layout = () => {
         onMenuMouseEnter={handleMenuMouseEnter}
         onMenuMouseLeave={handleMenuMouseLeave}
       />
+      <LoadingBar />
       <Sidebar
         isOpen={sidebarOpen}
         onClose={handleCloseSidebar}
