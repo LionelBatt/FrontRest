@@ -226,7 +226,7 @@ const Search = () => {
                                         value={selectedCityId}
                                         onChange={(e) => {
                                             setSelectedCityId(e.target.value);
-                                            setSelectedCity(city.find(c => c.id === Number(selectedCityId)).name);
+                                            setSelectedCity(city.find(c => c.id === Number(e.target.value)).name);
                                         }}
                                     >
                                         <option value="" disabled>
