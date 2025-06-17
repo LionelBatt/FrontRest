@@ -741,3 +741,55 @@
     display: none !important;
   }
 }
+
+/* === STYLES POUR FOND BLANC === */
+.glass-card-white-bg {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+.glass-breadcrumb-white {
+  background: rgba(248, 249, 250, 0.9) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px;
+}
+
+.glass-btn-primary-white {
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.9), rgba(13, 110, 253, 0.8)) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(13, 110, 253, 0.6) !important;
+  box-shadow: 0 4px 16px rgba(13, 110, 253, 0.3);
+  color: white !important;
+}
+
+.glass-btn-white {
+  background: rgba(248, 249, 250, 0.9) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  color: #333 !important;
+  transition: all 0.3s ease;
+}
+
+.glass-btn-white:hover {
+  background: rgba(233, 236, 239, 0.9) !important;
+  color: #333 !important;
+  transform: translateY(-1px);
+}
+
+.glass-text-dark {
+  color: #333 !important;
+}
+
+.glass-text-muted {
+  color: #6c757d !important;
+}
+
+/* === RESPONSIVE === */

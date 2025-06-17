@@ -13,6 +13,14 @@ const Cart = () => {
     const [numberOfPassengers, setNumberOfPassengers] = useState(1);
     const [tripStartDate, setTripStartDate] = useState('');
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+    const [showCardModal, setShowCardModal] = useState(false);
+    const [cardData, setCardData] = useState({
+        cardNumber: '',
+        cardHolder: '',
+        secretNumber: '',
+    });
+    const [cardError, setCardError] = useState('');
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     useEffect(() => {
         // Récupérer les données du panier depuis la navigation ou le localStorage
@@ -74,14 +82,133 @@ const Cart = () => {
         return tripPrice + optionsPrice;
     };
 
+    const simulatePaymentVerification = async () => {
+        setIsProcessingPayment(true);
+        
+        // Simuler un délai de vérification bancaire (2-3 secondes)
+        await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 1000));
+        
+        // Simuler 95% de succès
+        const success = Math.random() > 0.05;
+        
+        if (!success) {
+            setIsProcessingPayment(false);
+            throw new Error('Échec de la vérification bancaire. Veuillez réessayer.');
+        }
+        
+        setIsProcessingPayment(false);
+    };
+
+    const handleCardSubmit = async () => {
+        setCardError('');
+        
+        // Validation des champs
+        if (!cardData.cardNumber || !cardData.cardHolder || !cardData.secretNumber) {
+            setCardError('Veuillez remplir tous les champs');
+            return;
+        }
+
+        // Validation du numéro de carte (16 chiffres)
+        if (!/^\d{16}$/.test(cardData.cardNumber.replace(/\s/g, ''))) {
+            setCardError('Le numéro de carte doit contenir 16 chiffres');
+            return;
+        }
+
+        // Validation du code secret (3 chiffres)
+        if (!/^\d{3}$/.test(cardData.secretNumber)) {
+            setCardError('Le code secret doit contenir 3 chiffres');
+            return;
+        }
+
+        try {
+            setIsProcessingPayment(true);
+            
+            // Mettre à jour le profil utilisateur avec la carte
+            const updatedProfile = {
+                ...userProfile,
+                cardInfo: {
+                    cardNumber: cardData.cardNumber.replace(/\s/g, ''),
+                    cardHolder: cardData.cardHolder,
+                    secretNumber: parseInt(cardData.secretNumber)
+                }
+            };
+
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://15.188.48.92:8080/travel/users/profil', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProfile)
+            });
+
+            if (response.ok) {
+                // Ajouter le maskedCardNumber pour l'affichage local seulement
+                const updatedProfileWithMask = {
+                    ...updatedProfile,
+                    cardInfo: {
+                        ...updatedProfile.cardInfo,
+                        maskedCardNumber: `**** **** **** ${cardData.cardNumber.slice(-4)}`
+                    }
+                };
+                
+                setUserProfile(updatedProfileWithMask);
+                setShowCardModal(false);
+                setCardData({ cardNumber: '', cardHolder: '', secretNumber: '' });
+                // Relancer la commande
+                handlePlaceOrder();
+            } else {
+                setCardError('Erreur lors de l\'ajout de la carte');
+            }
+        } catch (err) {
+            setCardError('Erreur de connexion au serveur');
+        } finally {
+            setIsProcessingPayment(false);
+        }
+    };
+
+    const formatCardNumber = (value) => {
+        // Supprimer tous les caractères non numériques
+        const numericValue = value.replace(/\D/g, '');
+        // Ajouter des espaces tous les 4 chiffres
+        return numericValue.replace(/(\d{4})(?=\d)/g, '$1 ');
+    };
+
+    const handleCardInputChange = (e) => {
+        const { name, value } = e.target;
+        
+        if (name === 'cardNumber') {
+            const formattedValue = formatCardNumber(value);
+            if (formattedValue.replace(/\s/g, '').length <= 16) {
+                setCardData(prev => ({ ...prev, [name]: formattedValue }));
+            }
+        } else if (name === 'secretNumber') {
+            if (/^\d{0,3}$/.test(value)) {
+                setCardData(prev => ({ ...prev, [name]: value }));
+            }
+        } else {
+            setCardData(prev => ({ ...prev, [name]: value }));
+        }
+    };
+
     const handlePlaceOrder = async () => {
         if (!tripStartDate) {
             setError('Veuillez sélectionner une date de départ');
             return;
         }
 
+        // Vérifier si l'utilisateur a une carte bancaire
+        if (!userProfile?.cardInfo) {
+            setShowCardModal(true);
+            return;
+        }
+
         setIsProcessingOrder(true);
         setError('');
+
+        // Simuler la vérification bancaire
+        await simulatePaymentVerification();
 
         const orderData = {
             orderId: 0,
@@ -448,6 +575,123 @@ const Cart = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal pour ajouter une carte bancaire */}
+            {showCardModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">
+                                    <i className="fas fa-credit-card me-2"></i>
+                                    Ajouter une carte bancaire
+                                </h5>
+                                <button 
+                                    type="button" 
+                                    className="btn-close" 
+                                    onClick={() => setShowCardModal(false)}
+                                ></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="alert alert-info">
+                                    <i className="fas fa-info-circle me-2"></i>
+                                    Vous devez ajouter une carte bancaire pour finaliser votre commande.
+                                </div>
+                                
+                                {cardError && (
+                                    <div className="alert alert-danger">
+                                        {cardError}
+                                    </div>
+                                )}
+
+                                <form>
+                                    <div className="mb-3">
+                                        <label htmlFor="cardNumber" className="form-label">
+                                            Numéro de carte *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="cardNumber"
+                                            name="cardNumber"
+                                            value={cardData.cardNumber}
+                                            onChange={handleCardInputChange}
+                                            placeholder="1234 5678 9012 3456"
+                                            maxLength="19"
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label htmlFor="cardHolder" className="form-label">
+                                            Nom du porteur *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="cardHolder"
+                                            name="cardHolder"
+                                            value={cardData.cardHolder}
+                                            onChange={handleCardInputChange}
+                                            placeholder="JOHN DOE"
+                                            style={{ textTransform: 'uppercase' }}
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label htmlFor="secretNumber" className="form-label">
+                                            Code CVV *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="secretNumber"
+                                            name="secretNumber"
+                                            value={cardData.secretNumber}
+                                            onChange={handleCardInputChange}
+                                            placeholder="123"
+                                            maxLength="3"
+                                        />
+                                    </div>
+                                </form>
+
+                                <div className="mt-3 p-3 bg-light rounded">
+                                    <small className="text-muted">
+                                        <i className="fas fa-lock me-1"></i>
+                                        Vos informations bancaires sont sécurisées et chiffrées.
+                                    </small>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button 
+                                    type="button" 
+                                    className="btn btn-secondary" 
+                                    onClick={() => setShowCardModal(false)}
+                                >
+                                    Annuler
+                                </button>
+                                <button 
+                                    type="button" 
+                                    className="btn btn-primary" 
+                                    onClick={handleCardSubmit}
+                                    disabled={isProcessingPayment}
+                                >
+                                    {isProcessingPayment ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            Traitement...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-plus me-2"></i>
+                                            Ajouter la carte
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
