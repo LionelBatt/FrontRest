@@ -9,16 +9,16 @@ const Search = () => {
     const [loading, setLoading] = useState(true);
 
     const params = new URLSearchParams(location.search);
-    const [selectedContinent, setSelectedContinent] = useState(params.get("continent"));
-    const [selectedCountry, setSelectedCountry] = useState(params.get("country"));
-    const [selectedCity, setSelectedCity] = useState(params.get("city"));
-    const [selectedMinPrice, setSelectedMinPrice] = useState(params.get("minprice"));
-    const [selectedMaxPrice, setSelectedMaxPrice] = useState(params.get("maxprice"));
-    const [selectedOpt1, setSelectedOpt1] = useState(params.get("opt1"));
-    const [selectedOpt2, setSelectedOpt2] = useState(params.get("opt2"));
-    const [selectedOpt3, setSelectedOpt3] = useState(params.get("opt3"));
-    const [minimumDuration, setMinimumDuration] = useState(params.get("mindur"));
-    const [maximumDuration, setMaximumDuration] = useState(params.get("maxdur"));
+    const [selectedContinent, setSelectedContinent] = useState(params.get("continent") || "null");
+    const [selectedCountry, setSelectedCountry] = useState(params.get("country") || "null");
+    const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
+    const [selectedMinPrice, setSelectedMinPrice] = useState(1);
+    const [selectedMaxPrice, setSelectedMaxPrice] = useState(9999999);
+    const [selectedOpt1, setSelectedOpt1] = useState(-1);
+    const [selectedOpt2, setSelectedOpt2] = useState(-1);
+    const [selectedOpt3, setSelectedOpt3] = useState(-1);
+    const [minimumDuration, setMinimumDuration] = useState(1);
+    const [maximumDuration, setMaximumDuration] = useState(9999);
 
 
     const [price, setPrice] = useState(2500);
@@ -30,11 +30,7 @@ const Search = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        fetch("http://localhost:8080/travel/destination/continents", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        fetch("http://localhost:8080/travel/destination/continents")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -43,11 +39,8 @@ const Search = () => {
             })
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
-        fetch("http://15.188.48.92:8080/travel/destination/countries", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        
+      fetch("http://15.188.48.92:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -59,11 +52,8 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://15.188.48.92:8080/travel/destination/cities", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+
+        fetch("http://15.188.48.92:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -78,10 +68,10 @@ const Search = () => {
 
     }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        if (event) event.preventDefault();
 
-        let apiUrl = `http://15.188.48.92:8080/travel/search/`;
+        let apiUrl = `http://15.188.48.92:8080/travel/trips/filter/';
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
@@ -110,7 +100,6 @@ const Search = () => {
     };
 
     if (loading) return <p>Chargement...</p>;
-    if (!trips.length) return <p>Aucun résultat trouvé.</p>;
     return (
         <>
             <div className="container" style={{ textAlign: "center" }}>
@@ -272,16 +261,17 @@ const Search = () => {
                 </form>
             </div>
 
+            {trips.length &&
+                <div className="container">
+                    <h1 className="text-center mb-5 text-primary">Résultat de Recherche</h1>
 
-            <div class="container">
-                <h1 class="text-center mb-5 text-primary">Résultat de Recherche</h1>
-
-                <ul>
-                    {trips.map(trip => (
-                        <li key={trip.id}>{trip.name}</li>
-                    ))}
-                </ul>
-            </div>
+                    <ul>
+                        {trips.map(trip => (
+                            <li key={trip.id}>{trip.name}</li>
+                        ))}
+                    </ul>
+                </div>
+            }
         </>
     )
 }
