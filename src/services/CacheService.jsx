@@ -8,12 +8,12 @@ class CacheService {
 
         try {
             const { value, expiry } = JSON.parse(item);
-            
+
             if (Date.now() > expiry) {
                 localStorage.removeItem(`cache_${key}`);
                 return null;
             }
-            
+
             return value;
         } catch {
             return null;
@@ -25,7 +25,7 @@ class CacheService {
             value,
             expiry: Date.now() + (ttlMinutes * 60 * 1000)
         };
-        
+
         localStorage.setItem(`cache_${key}`, JSON.stringify(item));
     }
 
@@ -33,19 +33,23 @@ class CacheService {
         const cached = this.get(key);
         if (cached) {
             console.log(`📦 Cache: ${key}`);
+            console.log("Réponse brute: ", cached);
             return cached;
         }
         // Sinon faire l'appel API‡
         console.log(`API: ${key}`);
         const response = await fetch(url);
-        const result = await response.json();
-        
-        if (result.success) {
+        console.log("Status:", response.status);
+
+
+        if (response.status === 200) {
+            const result = await response.json();
+            console.log("Réponse brute: ", result);
             this.set(key, result.data, ttlMinutes);
             return result.data;
         }
-        
-        throw new Error(result.message || 'Erreur API');
+
+        throw new Error(response.message || 'Erreur API');
     }
 
     static clear() {
