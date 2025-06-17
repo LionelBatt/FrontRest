@@ -79,9 +79,9 @@ const Search = () => {
     }, []);
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
 
-        let apiUrl = `http://15.188.48.92:8080/travel/search/`;
+        let apiUrl = `http://15.188.48.92:8080/travel/trips/filter/`;
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
@@ -96,7 +96,6 @@ const Search = () => {
 
         // Enlève le dernier /
         apiUrl = apiUrl.slice(0, -1);
-
         fetch(apiUrl)
             .then(res => res.json())
             .then(data => {
@@ -273,8 +272,8 @@ const Search = () => {
             </div>
 
 
-            <div class="container">
-                <h1 class="text-center mb-5 text-primary">Résultat de Recherche</h1>
+            <div className="container">
+                <h1 className="text-center mb-5 text-primary">Résultat de Recherche</h1>
 
                 <ul>
                     {trips.map(trip => (

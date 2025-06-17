@@ -1,52 +1,134 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import CartService from '../services/CartService';
 
 
 const Login = () => {
     const [inputs, setInputs] = useState({});
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Pré-remplir le champ login si on vient de la page d'inscription
+    useEffect(() => {
+        if (location.state?.username) {
+            setInputs(prev => ({
+                ...prev,
+                login: location.state.username
+            }));
+        }
+
+        // Nettoyer le sessionStorage après 10 minutes d'inactivité
+        const cleanup = setTimeout(() => {
+            sessionStorage.removeItem('pendingCart');
+            sessionStorage.removeItem('redirectAfterLogin');
+        }, 10 * 60 * 1000); // 10 minutes
+
+        return () => clearTimeout(cleanup);
+    }, [location.state]);
+
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
         setInputs(values => ({ ...values, [name]: value }))
     }
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
+        setError('');
         console.log(inputs);
 
-        fetch("http://15.188.48.92:8080/travel/auth/signin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: inputs.login,
-                password: inputs.pwd
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // Stockage du token
-                    localStorage.setItem("token", data.data);
+        try {
+            const response = await fetch("http://15.188.48.92:8080/travel/auth/signin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: inputs.login,
+                    password: inputs.pwd
+                })
+            });
 
-                    console.log("Connexion réussie :", data);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Stockage du token
+                localStorage.setItem("token", data.data);
+                console.log("Connexion réussie :", data);
+                window.dispatchEvent(new Event('loginStatusChanged'));
+                
+                // Vérifier s'il y a un panier en attente ou une redirection
+                const pendingCart = sessionStorage.getItem('pendingCart');
+                const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+                
+                if (pendingCart) {
+                    // Sauvegarder le panier en attente dans le localStorage
+                    const cartData = JSON.parse(pendingCart);
+                    CartService.saveCart(cartData);
                     
-                    window.dispatchEvent(new Event('loginStatusChanged'));
+                    // Nettoyer le sessionStorage
+                    sessionStorage.removeItem('pendingCart');
+                    sessionStorage.removeItem('redirectAfterLogin');
                     
-                    navigate(`/`);
+                    // Rediriger vers le panier
+                    navigate('/cart', { state: { cartData } });
+                } else if (redirectAfterLogin) {
+                    // Nettoyer et rediriger vers la page demandée
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    navigate(redirectAfterLogin);
+                } else if (location.state?.redirectTo) {
+                    // Redirection via state
+                    navigate(location.state.redirectTo);
                 } else {
-                    alert("Erreur de connexion : " + data.message || data.error);
+                    // Redirection par défaut
+                    navigate('/');
                 }
-            })
-            .catch(err => console.error("Erreur lors de la connexion :", err));
+            } else {
+                // Gérer les différents types d'erreurs
+                if (data.data && typeof data.data === 'string') {
+                    // Afficher le message détaillé avec les tentatives restantes
+                    setError(data.data);
+                } else {
+                    setError(data.message || data.error || 'Erreur de connexion');
+                }
+            }
+        } catch (err) {
+            console.error("Erreur lors de la connexion :", err);
+            setError('Erreur de connexion au serveur');
+        } finally {
+            setIsLoading(false);
+        }
     }
     return (
         <>
             <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
                 <div className="border rounded p-4 shadow" style={{ maxWidth: "400px", width: "100%" }}>
                     <h2 className="text-center mb-4">Identifiez-vous</h2>
+
+                    {/* Message d'information si redirection depuis panier */}
+                    {location.state?.message && (
+                        <div className="alert alert-info" role="alert">
+                            <i className="fas fa-info-circle me-2"></i>
+                            {location.state.message}
+                        </div>
+                    )}
+
+                    {/* Message de panier en attente */}
+                    {sessionStorage.getItem('pendingCart') && (
+                        <div className="alert alert-warning" role="alert">
+                            <i className="fas fa-shopping-cart me-2"></i>
+                            Vous avez un voyage en attente d'ajout au panier. Connectez-vous pour continuer.
+                        </div>
+                    )}
+
+                    {error && (
+                        <div className="alert alert-danger" role="alert">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
@@ -57,6 +139,7 @@ const Login = () => {
                                 id="login"
                                 placeholder="Enter login"
                                 name="login"
+                                value={inputs.login || ''}
                                 onChange={handleChange}
                             />
                         </div>
@@ -91,12 +174,25 @@ const Login = () => {
                         </div>
 
                         <div className="d-grid mb-3">
-                            <button type="submit" className="btn btn-primary">Connexion</button>
+                            <button 
+                                type="submit" 
+                                className="btn btn-primary"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Connexion...
+                                    </>
+                                ) : (
+                                    'Connexion'
+                                )}
+                            </button>
                         </div>
                     </form>
 
                     <div className="text-center">
-                        <Link to="/createacc">Pas de compte ? Inscrivez-vous</Link>
+                        <Link to="/signup">Pas de compte ? Inscrivez-vous</Link>
                     </div>
                 </div>
             </div>

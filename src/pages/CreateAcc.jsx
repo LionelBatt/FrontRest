@@ -1,154 +1,255 @@
 
 
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/glassmorphism.css';
+
 const CreateAcc = () => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        email: '',
+        phoneNumber: '',
+        name: '',
+        surname: '',
+        address: ''
+    });
+    const [isLoading, setIsLoading] = useState(false); 
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const response = await fetch('http://15.188.48.92:8080/travel/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                setSuccess('Compte créé avec succès! Redirection vers la page de connexion...');
+                // Rediriger vers la page de login avec le username pré-rempli
+                setTimeout(() => {
+                    navigate('/login', { state: { username: formData.username } });
+                }, 2000);
+            } else {
+                const errorData = await response.json();
+                // Gérer spécifiquement le cas où le nom d'utilisateur est déjà pris
+                if (errorData.data && typeof errorData.data === 'string') {
+                    setError(errorData.data);
+                } else {
+                    setError(errorData.message || errorData.error || 'Erreur lors de la création du compte');
+                }
+            }
+        } catch (err) {
+            setError('Erreur de connexion au serveur');
+            console.error('Erreur:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
-            <br></br>
-            <br></br>
-            <br></br>
-            <div class="container mt-4">
-                <div class="mx-auto" style="max-width: 600px;">
-                    <h1>Création du compte</h1>
-                    <h2>Veuillez saisir vos informations personnelles.</h2>
-                    <p></p>
-                    <div>
-                        <input type="radio" id="Mr" name="label" value="Mr"></input> <label
-                            for="Mr">Mr.</label> <input type="radio" id="Mme" name="label"
-                                value="Mme"></input> <label for="Mme">Mme.</label> <input
-                                    type="radio" id="Mlle" name="label" value="Mlle"></input> <label
-                                        for="Mlle">Mlle.</label>
-                    </div>
-                    <br></br>
-                    <div class="mb-3">
-                        <label for="login">Login:</label> <input type="text"
-                            class="form-control" id="login" placeholder="Enter login"
-                            name="login"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="pwd">Password:</label> <input type="password"
-                            class="form-control" id="pwd" placeholder="Enter password"
-                            name="pswd"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="nom">Nom:</label> <input type="text"
-                            class="form-control" id="nom" placeholder="Enter name" name="nom"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="prenom">Prenom:</label> <input type="text"
-                            class="form-control" id="prenom" placeholder="Enter surname"
-                            name="prenom"></input>
-                    </div>
-                    <label class="form-label">Date de naissance :</label>
-                    <div class="d-flex gap-2">
+            <div className="container" style={{ marginTop: '100px', marginBottom: '50px' }}>
+                <div className="row justify-content-center">
+                    <div className="col-lg-8 col-md-10">
+                        <div className="card shadow">
+                            <div className="row g-0">
+                                {/* Image Column */}
+                                <div className="col-md-4">
+                                    <img 
+                                        src="/assets/images/pexels-lkloeppel-466685.jpg" 
+                                        className="img-fluid rounded-start h-100" 
+                                        alt="Travel"
+                                        style={{ objectFit: 'cover' }}
+                                    />
+                                </div>
+                                
+                                {/* Form Column */}
+                                <div className="col-md-8">
+                                    <div className="card-body">
+                                        <h1 className="card-title h3 mb-3">Création du compte</h1>
+                                        <p className="card-text text-muted mb-4">
+                                            Veuillez saisir vos informations personnelles pour créer votre compte.
+                                        </p>
+                                        
+                                        {error && (
+                                            <div className="alert alert-danger" role="alert">
+                                                {error}
+                                            </div>
+                                        )}
+                                        
+                                        {success && (
+                                            <div className="alert alert-success" role="alert">
+                                                {success}
+                                            </div>
+                                        )}
 
-                        {/* <!-- Jour --> */}
-                        <select class="form-select w-auto" title="Jour de naissance">
-                            <option selected disabled>Jour</option>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                            <option>7</option>
-                            <option>8</option>
-                            <option>9</option>
-                            <option>10</option>
-                            <option>11</option>
-                            <option>12</option>
-                            <option>13</option>
-                            <option>14</option>
-                            <option>15</option>
-                            <option>16</option>
-                            <option>17</option>
-                            <option>18</option>
-                            <option>19</option>
-                            <option>20</option>
-                            <option>21</option>
-                            <option>22</option>
-                            <option>23</option>
-                            <option>24</option>
-                            <option>25</option>
-                            <option>26</option>
-                            <option>27</option>
-                            <option>28</option>
-                            <option>29</option>
-                            <option>30</option>
-                            <option>31</option>
-                        </select>
+                                        <form onSubmit={handleSubmit}>
+                                            {/* Première ligne: Username + Password */}
+                                            <div className="row mb-3">
+                                                <div className="col-md-6">
+                                                    <label htmlFor="username" className="form-label">Nom d'utilisateur</label>
+                                                    <input 
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="username"
+                                                        name="username"
+                                                        placeholder="Nom d'utilisateur"
+                                                        value={formData.username}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <label htmlFor="password" className="form-label">Mot de passe</label>
+                                                    <input 
+                                                        type="password"
+                                                        className="form-control"
+                                                        id="password"
+                                                        name="password"
+                                                        placeholder="Mot de passe"
+                                                        value={formData.password}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
 
-                        {/* <!-- Mois --> */}
-                        <select class="form-select w-auto" title="Année de naissance">
-                            <option selected disabled>Mois</option>
-                            <option>Janvier</option>
-                            <option>Février</option>
-                            <option>Mars</option>
-                            <option>Avril</option>
-                            <option>Mai</option>
-                            <option>Juin</option>
-                            <option>Juillet</option>
-                            <option>Août</option>
-                            <option>Septembre</option>
-                            <option>Octobre</option>
-                            <option>Novembre</option>
-                            <option>Décembre</option>
-                        </select>
+                                            {/* Deuxième ligne: Nom + Prénom */}
+                                            <div className="row mb-3">
+                                                <div className="col-md-6">
+                                                    <label htmlFor="name" className="form-label">Nom</label>
+                                                    <input 
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="name"
+                                                        name="name"
+                                                        placeholder="Votre nom"
+                                                        value={formData.name}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <label htmlFor="surname" className="form-label">Prénom</label>
+                                                    <input 
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="surname"
+                                                        name="surname"
+                                                        placeholder="Votre prénom"
+                                                        value={formData.surname}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
 
-                        {/* <!-- Ann�e --> */}
-                        <select class="form-select w-auto" title="Année de naissance">
-                            <option selected disabled>Année</option>
-                            <option>1980</option>
-                            <option>1981</option>
-                            <option>1982</option>
-                            <option>1983</option>
-                            <option>1984</option>
-                            <option>1985</option>
-                            <option>1986</option>
-                            <option>1987</option>
-                            <option>1988</option>
-                            <option>1989</option>
-                            <option>1990</option>
-                            <option>1991</option>
-                            <option>1992</option>
-                            <option>1993</option>
-                            <option>1994</option>
-                            <option>1995</option>
-                            <option>1996</option>
-                            <option>1997</option>
-                            <option>1998</option>
-                            <option>1999</option>
-                            <option>2000</option>
-                            <option>2001</option>
-                            <option>2002</option>
-                            <option>2003</option>
-                            <option>2004</option>
-                            <option>2005</option>
-                        </select>
+                                            {/* Troisième ligne: Email + Téléphone */}
+                                            <div className="row mb-3">
+                                                <div className="col-md-6">
+                                                    <label htmlFor="email" className="form-label">Email</label>
+                                                    <input 
+                                                        type="email"
+                                                        className="form-control"
+                                                        id="email"
+                                                        name="email"
+                                                        placeholder="votre@email.com"
+                                                        value={formData.email}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <label htmlFor="phoneNumber" className="form-label">Téléphone</label>
+                                                    <input 
+                                                        type="tel"
+                                                        className="form-control"
+                                                        id="phoneNumber"
+                                                        name="phoneNumber"
+                                                        placeholder="+33612345678"
+                                                        value={formData.phoneNumber}
+                                                        onChange={handleInputChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
 
+                                            {/* Quatrième ligne: Adresse (pleine largeur) */}
+                                            <div className="mb-3">
+                                                <label htmlFor="address" className="form-label">Adresse complète</label>
+                                                <textarea 
+                                                    className="form-control"
+                                                    id="address"
+                                                    name="address"
+                                                    rows="2"
+                                                    placeholder="Votre adresse complète"
+                                                    value={formData.address}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* Bouton de soumission */}
+                                            <div className="d-grid">
+                                                <button 
+                                                    type="submit" 
+                                                    className="btn btn-primary btn-lg"
+                                                    disabled={isLoading}
+                                                >
+                                                    {isLoading ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                            Création en cours...
+                                                        </>
+                                                    ) : (
+                                                        'Créer le compte'
+                                                    )}
+                                                </button>
+                                            </div>
+
+                                            {/* Lien vers la connexion */}
+                                            <div className="text-center mt-3">
+                                                <p className="card-text">
+                                                    <small className="text-muted">
+                                                        Vous avez déjà un compte ? 
+                                                        <button 
+                                                            type="button"
+                                                            className="btn btn-link p-0 ms-1"
+                                                            onClick={() => navigate('/login')}
+                                                        >
+                                                            Se connecter
+                                                        </button>
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="tel">Numéro de téléphone:</label> <input type="tel"
-                            class="form-control" id="tel" placeholder="Enter phone number"
-                            name="tel"></input>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email">Email:</label> <input type="email"
-                            class="form-control" id="email" placeholder="Enter email"
-                            name="email"></input>
-                    </div>
-                    <div class="form-check mb-3">
-                        <label class="form-check-label"> <input
-                            class="form-check-input" type="checkbox" name="newsletter"></input>
-                            Me tenir au courant des dernières offres grâce à la Newsletter.
-                        </label>
-                    </div>
-                    <br></br> <a href="index.html" class="btn btn-primary">Insciption</a>
-                    <hr></hr>
                 </div>
             </div>
         </>
-
     )
 }
 

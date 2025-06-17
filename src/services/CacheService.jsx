@@ -32,10 +32,10 @@ class CacheService {
     static async fetchWithCache(key, url, ttlMinutes = 30) {
         const cached = this.get(key);
         if (cached) {
-            console.log(`📦 Cache: ${key}`);
+            console.log(`Cache: ${key}`);
             return cached;
         }
-        // Sinon faire l'appel API‡
+        // Sinon faire l'appel API
         console.log(`API: ${key}`);
         const response = await fetch(url);
         const result = await response.json();

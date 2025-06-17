@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Package, Settings } from 'lucide-react';
 import CacheService from '../services/CacheService';
+import CartService from '../services/CartService';
 
 const FicheVoyage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [tripData, setTripData] = useState(null);
     const [allOptions, setAllOptions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -160,6 +162,63 @@ const FicheVoyage = () => {
             groups[category].push(option);
             return groups;
         }, {});
+    };
+
+    const handleAddToCart = () => {
+        // Vérifier si l'utilisateur est connecté
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            // Sauvegarder les données du voyage et options pour après connexion
+            const cartData = {
+                trip: tripData,
+                selectedOptions: selectedOptions,
+                totalPrice: totalPrice
+            };
+            
+            // Sauvegarder temporairement dans sessionStorage (pas localStorage)
+            sessionStorage.setItem('pendingCart', JSON.stringify(cartData));
+            sessionStorage.setItem('redirectAfterLogin', `/trip/${id}`);
+            
+            // Rediriger vers la page de connexion
+            navigate('/login', { 
+                state: { 
+                    message: 'Veuillez vous connecter pour ajouter ce voyage à votre panier.',
+                    redirectTo: `/trip/${id}`,
+                    pendingCart: cartData
+                } 
+            });
+            return;
+        }
+
+        // Utilisateur connecté : procéder normalement
+        // Vérifier s'il y a déjà un panier
+        const existingCart = CartService.getCart();
+        
+        if (existingCart) {
+            // Demander confirmation pour remplacer le panier existant
+            const confirmReplace = window.confirm(
+                `Vous avez déjà un voyage dans votre panier (${existingCart.trip.destinationCity}, ${existingCart.trip.destinationCountry}).\n\n` +
+                `Voulez-vous le remplacer par ce nouveau voyage ?\n\n` +
+                `Cliquez sur "OK" pour remplacer ou "Annuler" pour garder l'ancien panier.`
+            );
+            
+            if (!confirmReplace) {
+                return; // L'utilisateur a choisi de garder l'ancien panier
+            }
+        }
+
+        const cartData = {
+            trip: tripData,
+            selectedOptions: selectedOptions,
+            totalPrice: totalPrice
+        };
+
+        // Sauvegarder dans le localStorage (remplace l'ancien)
+        CartService.saveCart(cartData);
+
+        // Naviguer vers la page panier avec les données
+        navigate('/cart', { state: { cartData } });
     };
 
     if (loading) {
@@ -590,10 +649,16 @@ const FicheVoyage = () => {
                                 )}
                             </div>
                             
-                            <button className="glass-btn-primary glass-border-radius-lg w-100 py-3 border-0 d-flex align-items-center justify-content-center gap-2">
-                                <Package size={18} />
-                                Réserver maintenant - {totalPrice}€
-                            </button>
+                            <div className="d-grid gap-2">
+                                <button className="glass-btn-primary glass-border-radius-lg py-3 border-0 d-flex align-items-center justify-content-center gap-2" onClick={handleAddToCart}>
+                                    <Package size={18} />
+                                    Ajouter au panier - {totalPrice}€
+                                </button>
+                                
+                                <small className="text-center text-white" style={{ opacity: '0.8' }}>
+                                    ✓ Réservation flexible • ✓ Paiement sécurisé • ✓ Annulation gratuite
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>

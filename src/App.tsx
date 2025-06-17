@@ -10,6 +10,9 @@ import Login from './pages/Login';
 import ResetPwd from './pages/ResetPwd';
 import SetPwd from './pages/SetPwd';
 import VerifCode from './pages/VerifCode';
+import Cart from './pages/Cart';
+import OrderConfirmation from './pages/OrderConfirmation';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -26,6 +29,9 @@ function App() {
             <Route path="/resetpwd" element={<ResetPwd />} />
             <Route path="/setpwd" element={<SetPwd />} />
             <Route path="/verification" element={<VerifCode />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/order-confirmation" element={<OrderConfirmation />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
 
