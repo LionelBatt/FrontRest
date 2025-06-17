@@ -71,7 +71,7 @@ const Search = () => {
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
 
-        let apiUrl = `http://15.188.48.92:8080/travel/trips/filter/';
+        let apiUrl = `http://15.188.48.92:8080/travel/trips/filter/`;
 
         if (selectedContinent) apiUrl += `${selectedContinent}/`;
         if (selectedCountry) apiUrl += `${selectedCountry}/`;
