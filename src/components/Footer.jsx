@@ -54,7 +54,7 @@ function Footer() {
                             <ul className="glass-footer-links">
                                 <li><a href="/" className="glass-footer-link">Accueil</a></li>
                                 <li><a href="/search" className="glass-footer-link">Rechercher</a></li>
-                                <li><a href="/loading-demo" className="glass-footer-link">Démonstration</a></li>
+                                <li><a href="/trip/1" className="glass-footer-link">Démonstration</a></li>
                                 <li><a href="/account" className="glass-footer-link">Mon Compte</a></li>
                                 <li><a href="/login" className="glass-footer-link">Connexion</a></li>
                             </ul>
