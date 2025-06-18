@@ -30,7 +30,7 @@ const SearchBar = () => {
     try {
       const data = await CacheService.fetchWithCache(
         `search_${text}`,
-        `http://localhost:8080/travel/trips/search/text/${encodeURIComponent(text)}`,
+        `http://13.39.150.189:8080/travel/trips/search/text/${encodeURIComponent(text)}`,
         5
       );
 

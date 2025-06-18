@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +20,7 @@ const AccParam = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:8080/travel/users/profil', {
+                const response = await fetch('http://13.39.150.189:8080/travel/users/profil', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

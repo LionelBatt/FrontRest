@@ -39,7 +39,7 @@ const Cart = () => {
             }
 
             try {
-                const response = await fetch('http://15.188.48.92:8080/travel/users/profil', {
+                const response = await fetch('http://13.39.150.189:8080/travel/users/profil', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -110,7 +110,7 @@ const Cart = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://15.188.48.92:8080/travel/orders', {
+            const response = await fetch('http://13.39.150.189:8080/travel/orders', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
