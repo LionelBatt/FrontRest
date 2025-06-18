@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { MapPin, Globe, Building, Settings, ChevronDown, ChevronRight, Package, RotateCcw } from 'lucide-react';
@@ -10,8 +10,6 @@ const Search = () => {
     const location = useLocation();
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedContinent, setExpandedContinent] = useState(null);
-    const [expandedCountry, setExpandedCountry] = useState(null);
 
     const params = new URLSearchParams(location.search);
     const [selectedContinentId, setSelectedContinentId] = useState("");
@@ -27,15 +25,12 @@ const Search = () => {
     const [maximumDuration, setMaximumDuration] = useState(40); 
 
 
-    const [price, setPrice] = useState(2500);
     const [continents, setContinents] = useState();
     const [country, setCountry] = useState();
     const [city, setCity] = useState();
     const [optionsPreselected, setOptionsPreselected] = useState([]);
     const [options, setOptions] = useState([]);
     const navigate = useNavigate();
-    const [error, setError] = useState(null);
-    const [message, setMessage] = useState(null);
     
     // États pour le dropdown d'options
     const [showAllOptions, setShowAllOptions] = useState(false);
@@ -51,11 +46,9 @@ const Search = () => {
             const data = result.data || result || [];
 
             setTrips(data);
-            setMessage(result.message || "");
 
         } catch (err) {
             console.error('Erreur:', err);
-            setError(err.message);
             setTrips([]); 
         } finally {
             setLoading(false);
@@ -72,11 +65,9 @@ const Search = () => {
             );
 
             setOptions(data);
-            setMessage(data.message || "");
 
         } catch (err) {
             console.error('Erreur:', err);
-            setError(err.message);
         } finally {
             setOptionsLoading(false);
         }
@@ -118,7 +109,7 @@ const Search = () => {
         fetchOptions();
 
         fetchTripDetails();
-    }, [selectedOpts]);
+    }, [selectedOpts,fetchTripDetails()]);
 
     const handleSubmit = (event) => {
         if (event) event.preventDefault();

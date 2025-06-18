@@ -1,4 +1,3 @@
-import SearchBar from "../components/SearchBar";
 import { useNavigate } from 'react-router-dom';
 import { Star, MapPin, Globe, Plane, Heart, Users, Award, Clock } from 'lucide-react';
 import '../styles/glassmorphism.css';
