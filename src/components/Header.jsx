@@ -82,8 +82,6 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
     }
 
     console.log('Redirection vers /cart');
-    // Toujours rediriger vers le panier, même s'il est vide
-    // L'utilisateur peut vouloir voir l'état de son panier
     navigate('/cart');
   };
 
@@ -120,7 +118,7 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
             style={{ 
               padding: '0.6rem',
               fontSize: '1.2rem',
-              color: 'black', /* Couleur noire explicite */
+              color: 'black',
             }}
             title="Destinations"
           >
@@ -134,7 +132,7 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
               fontWeight: '600',
               textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
               textDecoration: 'none',
-              color: 'black', /* Texte en noir comme demandé */
+              color: 'black', 
             }}
           >
             Agence de Voyage ✈

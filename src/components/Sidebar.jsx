@@ -24,10 +24,11 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
     try {
       setLoadingStates(prev => ({ ...prev, [continent]: true }));
 
+      // GARDE LE CACHE pour les voyages par continent (données assez stables)
       const data = await CacheService.fetchWithCache(
         `trips_continent_${continent}`,
         `http://13.39.150.189:8080/travel/trips/continent/${continent}`,
-        30 // 30 minutes de cache
+        120
       );
 
       setContinentTrips(prev => ({

@@ -11,20 +11,18 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Pré-remplir le champ login si on vient de la page d'inscription
     useEffect(() => {
         if (location.state?.username) {
             setInputs(prev => ({
                 ...prev,
-                login: location.state.username
+                login: location.state.username || ''
             }));
         }
 
-        // Nettoyer le sessionStorage après 10 minutes d'inactivité
         const cleanup = setTimeout(() => {
             sessionStorage.removeItem('pendingCart');
             sessionStorage.removeItem('redirectAfterLogin');
-        }, 10 * 60 * 1000); // 10 minutes
+        }, 10 * 60 * 1000);
 
         return () => clearTimeout(cleanup);
     }, [location.state]);
@@ -55,41 +53,30 @@ const Login = () => {
             const data = await response.json();
             
             if (data.success) {
-                // Stockage du token
                 localStorage.setItem("token", data.data);
                 console.log("Connexion réussie :", data);
                 window.dispatchEvent(new Event('loginStatusChanged'));
                 
-                // Vérifier s'il y a un panier en attente ou une redirection
                 const pendingCart = sessionStorage.getItem('pendingCart');
                 const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
                 
                 if (pendingCart) {
-                    // Sauvegarder le panier en attente dans le localStorage
                     const cartData = JSON.parse(pendingCart);
                     CartService.saveCart(cartData);
                     
-                    // Nettoyer le sessionStorage
                     sessionStorage.removeItem('pendingCart');
                     sessionStorage.removeItem('redirectAfterLogin');
-                    
-                    // Rediriger vers le panier
                     navigate('/cart', { state: { cartData } });
                 } else if (redirectAfterLogin) {
-                    // Nettoyer et rediriger vers la page demandée
                     sessionStorage.removeItem('redirectAfterLogin');
                     navigate(redirectAfterLogin);
                 } else if (location.state?.redirectTo) {
-                    // Redirection via state
                     navigate(location.state.redirectTo);
                 } else {
-                    // Redirection par défaut
                     navigate('/');
                 }
             } else {
-                // Gérer les différents types d'erreurs
                 if (data.data && typeof data.data === 'string') {
-                    // Afficher le message détaillé avec les tentatives restantes
                     setError(data.data);
                 } else {
                     setError(data.message || data.error || 'Erreur de connexion');

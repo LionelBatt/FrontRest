@@ -28,7 +28,6 @@ const AccParam = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState('');
 
-    // Charger le profil utilisateur au montage du composant
     useEffect(() => {
         const fetchUserProfile = async () => {
             const token = localStorage.getItem('token');
