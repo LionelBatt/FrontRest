@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { MapPin, Globe, Building, Settings, ChevronDown, ChevronRight, Package, RotateCcw } from 'lucide-react';
@@ -240,7 +240,9 @@ const Search = () => {
                                         const value = e.target.value;
                                         setSelectedContinentId(value);
                                         setSelectedCountry("null");
+                                        setSelectedCountryId("");
                                         setSelectedCity("null");
+                                        setSelectedCityId("");
                                         setSelectedContinent(continents.find(c => c.id === Number(value)).name);
                                     }}
                                 >
@@ -270,6 +272,7 @@ const Search = () => {
                                             setSelectedCountryId(value);
                                             setSelectedCountry(country.find(c => c.id === Number(value)).name);
                                             setSelectedCity("null");
+                                            setSelectedCityId("");
                                         }}
                                     >
                                         <option value="" disabled>
@@ -695,7 +698,7 @@ const Search = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* DESCRIPTION À DROITE DU CAROUSEL */}
                                             <div className="col-lg-4">
                                                 <div className="glass-card p-4 h-100" style={{
@@ -729,10 +732,10 @@ const Search = () => {
                                                             </li>
                                                         </ul>
                                                     </div>
-                                                    
+
                                                     {/* Bouton pour voir la fiche voyage */}
                                                     <div className="mt-4 d-flex justify-content-center">
-                                                        <button 
+                                                        <button
                                                             className="btn btn-success px-4 py-2 fw-bold"
                                                             onClick={() => navigate(`/trip/${tripData.id}`)}
                                                             style={{
