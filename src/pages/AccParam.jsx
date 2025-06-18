@@ -22,6 +22,11 @@ const AccParam = () => {
     });
     const [cardError, setCardError] = useState('');
     const [isProcessingCard, setIsProcessingCard] = useState(false);
+    const [isDeletingOrder, setIsDeletingOrder] = useState(false);
+    const [orderDeleteError, setOrderDeleteError] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
 
     // Charger le profil utilisateur au montage du composant
     useEffect(() => {
@@ -107,6 +112,18 @@ const AccParam = () => {
         setSuccess('');
 
         const token = localStorage.getItem('token');
+        
+        // Préparer les infos de carte propres (sans maskedCardNumber)
+        let cleanCardInfo = null;
+        if (userProfile.cardInfo) {
+            cleanCardInfo = {
+                id: userProfile.cardInfo.id,
+                cardNumber: userProfile.cardInfo.cardNumber || '', // Si pas de cardNumber complet, envoyer vide
+                cardHolder: userProfile.cardInfo.cardHolder,
+                secretNumber: userProfile.cardInfo.secretNumber || 0
+            };
+        }
+        
         // Préparer le body complet avec tous les champs obligatoires
         const updatedProfile = {
             userId: userProfile.userId,
@@ -117,12 +134,12 @@ const AccParam = () => {
             name: formData.name || userProfile.name,
             surname: formData.surname || userProfile.surname,
             address: formData.address || userProfile.address,
-            cardInfo: userProfile.cardInfo, // Préserver les infos de carte existantes
+            cardInfo: cleanCardInfo, // Utiliser les infos de carte nettoyées
             version: userProfile.version
         };
 
         try {
-            const response = await fetch('http://15.188.48.92:8080/travel/users/profil', {
+            const response = await fetch('http://13.39.150.189:8080/travel/users/profil', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -152,19 +169,16 @@ const AccParam = () => {
         navigate('/');
     };
 
-    // Fonction pour ouvrir la modal de détail de commande
     const handleOrderClick = (order) => {
         setSelectedOrder(order);
         setShowOrderModal(true);
     };
 
-    // Fonction pour fermer la modal
     const closeOrderModal = () => {
         setShowOrderModal(false);
         setSelectedOrder(null);
     };
 
-    // Fonction pour formater le prix
     const formatPrice = (price) => {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
@@ -172,7 +186,6 @@ const AccParam = () => {
         }).format(price);
     };
 
-    // Fonction pour formater la date
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('fr-FR', {
             year: 'numeric',
@@ -181,12 +194,93 @@ const AccParam = () => {
         });
     };
 
-    // Fonction pour formater la destination
     const formatDestination = (city, country) => {
         return `${city}, ${country}`;
     };
 
-    // Fonctions pour la gestion des cartes bancaires
+    const handleDeleteOrder = async () => {
+        if (!selectedOrder) return;
+        
+        setIsDeletingOrder(true);
+        setOrderDeleteError('');
+
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch(`http://13.39.150.189:8080/travel/orders/${selectedOrder.orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) { 
+                setOrders(orders.filter(order => order.orderId !== selectedOrder.orderId));
+                setSuccess('Commande supprimée avec succès !');
+                closeOrderModal();
+                setTimeout(() => {
+                    fetchUserOrders();
+                }, 500);
+            } else {
+                setOrderDeleteError(result.message || 'Erreur lors de la suppression de la commande');
+            }
+        } catch (err) {
+            setOrderDeleteError('Erreur de connexion au serveur');
+            console.error('Erreur:', err);
+        } finally {
+            setIsDeletingOrder(false);
+        }
+    };
+
+    const handleReorderTrip = () => {
+        if (selectedOrder?.trip?.id) {
+            navigate(`/trip/${selectedOrder.trip.id}`);
+        }
+        closeOrderModal();
+    };
+
+    // Fonctions pour la suppression du compte utilisateur
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true);
+        setDeleteError('');
+
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch(`http://13.39.150.189:8080/travel/users/${userProfile.userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                localStorage.removeItem('token');
+                window.dispatchEvent(new Event('loginStatusChanged'));
+                setShowDeleteModal(false);
+                navigate('/');
+            } else {
+                setDeleteError(result.message || 'Erreur lors de la suppression du compte');
+            }
+        } catch (err) {
+            setDeleteError('Erreur de connexion au serveur');
+            console.error('Erreur:', err);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleOpenDeleteModal = () => {
+        setDeleteError('');
+        setShowDeleteModal(true);
+    };
+
     const formatCardNumber = (value) => {
         return value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
     };
@@ -212,7 +306,6 @@ const AccParam = () => {
         setCardError('');
         setIsProcessingCard(true);
 
-        // Validation
         if (!cardData.cardNumber || !cardData.cardHolder || !cardData.secretNumber) {
             setCardError('Tous les champs sont obligatoires');
             setIsProcessingCard(false);
@@ -232,7 +325,7 @@ const AccParam = () => {
         }
 
         try {
-            // Préparer le body complet avec tous les champs obligatoires
+            // Préparer le body complet avec les bonnes infos de carte
             const updatedProfile = {
                 userId: userProfile.userId,
                 username: userProfile.username,
@@ -243,6 +336,7 @@ const AccParam = () => {
                 surname: userProfile.surname,
                 address: userProfile.address,
                 cardInfo: {
+                    id: userProfile.cardInfo?.id || 0, // ID de la carte existante ou 0 pour une nouvelle
                     cardNumber: cardData.cardNumber.replace(/\s/g, ''),
                     cardHolder: cardData.cardHolder,
                     secretNumber: parseInt(cardData.secretNumber)
@@ -251,7 +345,7 @@ const AccParam = () => {
             };
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://15.188.48.92:8080/travel/users/profil', {
+            const response = await fetch('http://13.39.150.189:8080/travel/users/profil', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -261,7 +355,6 @@ const AccParam = () => {
             });
 
             if (response.ok) {
-                // Ajouter le maskedCardNumber pour l'affichage local seulement
                 const updatedProfileWithMask = {
                     ...updatedProfile,
                     cardInfo: {
@@ -286,10 +379,9 @@ const AccParam = () => {
     };
 
     const handleEditCard = () => {
-        // Pré-remplir avec les données existantes si disponibles
         if (userProfile?.cardInfo) {
             setCardData({
-                cardNumber: userProfile.cardInfo.maskedCardNumber || '',
+                cardNumber: '',
                 cardHolder: userProfile.cardInfo.cardHolder || '',
                 secretNumber: ''
             });
@@ -332,7 +424,7 @@ const AccParam = () => {
                             <span className="text-primary">User</span>
                         </li>
                         <li className="breadcrumb-item active glass-text-muted" aria-current="page">
-                            User Profile
+                            {userProfile?.name || 'John'} {userProfile?.surname || 'Doe'}
                         </li>
                     </ol>
                 </nav>
@@ -362,15 +454,6 @@ const AccParam = () => {
                             <p className="glass-text-muted small mb-4">
                                 {userProfile?.address || 'Bay Area, San Francisco, CA'}
                             </p>
-                            <div className="d-grid gap-2">
-                                <button 
-                                    className="btn glass-btn-primary-white glass-border-radius-lg"
-                                    onClick={() => setIsEditing(!isEditing)}
-                                >
-                                    <i className="fas fa-user-plus me-2"></i>
-                                    {isEditing ? 'Annuler' : 'Modifier'}
-                                </button>
-                            </div>
                         </div>
 
                         {/* Card actions utilisateur */}
@@ -386,6 +469,14 @@ const AccParam = () => {
                                 >
                                     <i className="fas fa-sign-out-alt me-2"></i>
                                     Se déconnecter
+                                </button>
+                                <hr className="my-3" />
+                                <button 
+                                    className="btn btn-outline-danger glass-border-radius"
+                                    onClick={handleOpenDeleteModal}
+                                >
+                                    <i className="fas fa-trash-alt me-2"></i>
+                                    Supprimer mon compte
                                 </button>
                             </div>
                         </div>
@@ -441,7 +532,7 @@ const AccParam = () => {
                                             <label className="form-label glass-text-dark">Nom de famille</label>
                                             <input
                                                 type="text"
-                                                className="form-control glass-input"
+                                                className="form-control glass-input" 
                                                 name="surname"
                                                 value={formData.surname || ''}
                                                 onChange={handleInputChange}
@@ -793,22 +884,48 @@ const AccParam = () => {
                                         </div>
                                     </div>
                                 </div>
+                                
+                                {/* Messages d'erreur pour suppression de commande */}
+                                {orderDeleteError && (
+                                    <div className="alert alert-danger mt-3">
+                                        <i className="fas fa-exclamation-triangle me-2"></i>
+                                        {orderDeleteError}
+                                    </div>
+                                )}
+                                
                                 <div className="modal-footer border-0">
                                     <button 
                                         type="button" 
                                         className="btn glass-btn-white glass-border-radius" 
                                         onClick={closeOrderModal}
+                                        disabled={isDeletingOrder}
                                     >
                                         <i className="fas fa-times me-2"></i>
                                         Fermer
                                     </button>
                                     <button 
                                         type="button" 
+                                        className="btn btn-outline-danger glass-border-radius"
+                                        onClick={handleDeleteOrder}
+                                        disabled={isDeletingOrder}
+                                    >
+                                        {isDeletingOrder ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Suppression...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-trash-alt me-2"></i>
+                                                Supprimer ma commande
+                                            </>
+                                        )}
+                                    </button>
+                                    <button 
+                                        type="button" 
                                         className="btn glass-btn-primary-white glass-border-radius"
-                                        onClick={() => {
-                                            // Rediriger vers une page de réservation similaire ou d'évaluation
-                                            closeOrderModal();
-                                        }}
+                                        onClick={handleReorderTrip}
+                                        disabled={isDeletingOrder}
                                     >
                                         <i className="fas fa-repeat me-2"></i>
                                         Commander à nouveau
@@ -947,9 +1064,92 @@ const AccParam = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Modal de confirmation de suppression de compte */}
+                {showDeleteModal && (
+                    <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content glass-card-white-bg">
+                                <div className="modal-header border-0">
+                                    <h5 className="modal-title text-danger">
+                                        <i className="fas fa-exclamation-triangle me-2"></i>
+                                        Supprimer mon compte
+                                    </h5>
+                                    <button 
+                                        type="button" 
+                                        className="btn-close" 
+                                        onClick={() => setShowDeleteModal(false)}
+                                        disabled={isDeleting}
+                                    ></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="alert alert-danger">
+                                        <i className="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Attention !</strong> Cette action est irréversible.
+                                    </div>
+                                    
+                                    <p className="glass-text-dark mb-3">
+                                        Êtes-vous vraiment sûr(e) de vouloir supprimer définitivement votre compte ?
+                                    </p>
+                                    
+                                    <div className="bg-light p-3 rounded mb-3">
+                                        <h6 className="glass-text-dark mb-2">Cette action va :</h6>
+                                        <ul className="glass-text-muted mb-0">
+                                            <li>Supprimer définitivement vos informations personnelles</li>
+                                            <li>Annuler toutes vos réservations en cours</li>
+                                            <li>Effacer votre historique de voyages</li>
+                                            <li>Supprimer vos informations de paiement</li>
+                                        </ul>
+                                    </div>
+
+                                    {deleteError && (
+                                        <div className="alert alert-danger">
+                                            <i className="fas fa-exclamation-triangle me-2"></i>
+                                            {deleteError}
+                                        </div>
+                                    )}
+
+                                    <p className="glass-text-muted small">
+                                        <i className="fas fa-info-circle me-1"></i>
+                                        Pour confirmer, veuillez cliquer sur "Supprimer définitivement"
+                                    </p>
+                                </div>
+                                <div className="modal-footer border-0">
+                                    <button 
+                                        type="button" 
+                                        className="btn glass-btn-white glass-border-radius" 
+                                        onClick={() => setShowDeleteModal(false)}
+                                        disabled={isDeleting}
+                                    >
+                                        <i className="fas fa-times me-2"></i>
+                                        Annuler
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-danger glass-border-radius" 
+                                        onClick={handleDeleteAccount}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Suppression...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="fas fa-trash-alt me-2"></i>
+                                                Supprimer définitivement
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default AccParam;

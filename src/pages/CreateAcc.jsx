@@ -44,13 +44,11 @@ const CreateAcc = () => {
 
             if (response.ok) {
                 setSuccess('Compte créé avec succès! Redirection vers la page de connexion...');
-                // Rediriger vers la page de login avec le username pré-rempli
                 setTimeout(() => {
                     navigate('/login', { state: { username: formData.username } });
                 }, 2000);
             } else {
                 const errorData = await response.json();
-                // Gérer spécifiquement le cas où le nom d'utilisateur est déjà pris
                 if (errorData.data && typeof errorData.data === 'string') {
                     setError(errorData.data);
                 } else {

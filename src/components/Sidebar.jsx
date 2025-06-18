@@ -11,7 +11,6 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
   const [continentTrips, setContinentTrips] = useState({});
   const [loadingStates, setLoadingStates] = useState({});
 
-  // Liste fixe des continents
   const continents = [
     'AFRIQUE', 'AMERIQUE_DU_NORD', 'AMERIQUE_DU_SUD', 
     'ASIE', 'EUROPE', 'OCEANIE'
@@ -47,7 +46,6 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
     }
   };
 
-  // Extraire les pays uniques d'un continent
   const getCountriesFromTrips = (continent) => {
     if (!continentTrips[continent]) return [];
     
@@ -55,7 +53,7 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
     return countries.sort();
   };
 
-  // Extraire les villes d'un pays spécifique
+
   const getCitiesFromCountry = (continent, country) => {
     if (!continentTrips[continent]) return [];
     
@@ -66,7 +64,7 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
     return [...new Set(cities)].sort();
   };
 
-  // Obtenir les voyages d'un pays spécifique
+
   const getTripsByCountry = (continent, country) => {
     if (!continentTrips[continent]) return [];
     
@@ -75,7 +73,7 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
     );
   };
 
-  // Obtenir les voyages d'une ville spécifique
+
   const getTripsByCity = (continent, country, city) => {
     if (!continentTrips[continent]) return [];
     
@@ -125,27 +123,24 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
   };
 
   const handleTripSelect = (trip) => {
-    // Naviguer vers la page de détail du voyage
     window.location.href = `/trip/${trip.id}`;
   };
 
-  // Fonction pour obtenir les voyages à afficher dans le panel de droite
   const getTripsToDisplay = () => {
     if (!expandedContinent || !continentTrips[expandedContinent]) return [];
     
     if (selectedCity && selectedCountry) {
-      // Si une ville est sélectionnée, afficher les voyages de cette ville
+
       return getTripsByCity(expandedContinent, selectedCountry, selectedCity);
     } else if (selectedCountry) {
-      // Si un pays est sélectionné, afficher les voyages de ce pays
+
       return getTripsByCountry(expandedContinent, selectedCountry);
     } else {
-      // Sinon afficher tous les voyages du continent
+
       return continentTrips[expandedContinent];
     }
   };
 
-  // Fonction pour obtenir le titre du panel de droite
   const getPanelTitle = () => {
     if (selectedCity && selectedCountry) {
       return `Voyages à ${formatName(selectedCity)}`;

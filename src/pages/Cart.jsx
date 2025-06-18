@@ -23,22 +23,18 @@ const Cart = () => {
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     useEffect(() => {
-        // Récupérer les données du panier depuis la navigation ou le localStorage
         if (location.state?.cartData) {
             setCartData(location.state.cartData);
         } else {
-            // Essayer de récupérer depuis le localStorage
             const savedCart = CartService.getCart();
             if (savedCart) {
                 setCartData(savedCart);
             } else {
-                // Rediriger si pas de données de panier
                 navigate('/');
                 return;
             }
         }
-
-        // Charger le profil utilisateur
+        
         const fetchUserProfile = async () => {
             const token = localStorage.getItem('token');
             if (!token) {
