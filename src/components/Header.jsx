@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Globe, ShoppingCart } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import CartService from '../services/CartService';
+import SearchBar from './SearchBar';
 import '../styles/glassmorphism.css';
 
 const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
@@ -138,6 +139,11 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
             Agence de Voyage ✈
           </Link>
 
+          {/* SearchBar intégrée */}
+          <div className="d-none d-md-block mx-3">
+            <SearchBar isInHeader={true} />
+          </div>
+
           {/* Bouton Bootstrap avec style glassmorphism */}
           <button
             className="navbar-toggler glass-btn glass-border-radius"
@@ -157,6 +163,11 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
           </button>
 
           <div className="collapse navbar-collapse" id="navbarCollapse">
+            {/* SearchBar pour mobile */}
+            <div className="d-md-none mb-3">
+              <SearchBar isInHeader={true} />
+            </div>
+            
             <form className="d-flex ms-auto gap-2 align-items-center">
               {/* Icône panier avec pastille et menu déroulant */}
               <div className="dropdown">
@@ -256,19 +267,6 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
                   )}
                 </ul>
               </div>
-
-              <Link 
-                to="/search" 
-                className="btn glass-btn-success glass-border-radius-lg glass-text-white" 
-                role="button"
-                style={{
-                  fontWeight: '500',
-                  padding: '0.5rem 1rem',
-                  textDecoration: 'none',
-                }}
-              >
-                Rechercher
-              </Link>
               
               {isLoggedIn ? (
                 <>
