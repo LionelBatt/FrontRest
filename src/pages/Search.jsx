@@ -120,16 +120,15 @@ const Search = () => {
         fetchTripDetails();
 
 
-    }, []);
+    }, [selectedOpts]);
 
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
-        console.log(optionsPreselected);
-        if (optionsPreselected.length>0) {
-            const concatenatedIds = optionsPreselected.join(',');
+        if (optionsPreselected.length > 0) {
+            const optionIds = optionsPreselected.map(val => val.split('-')[1]);
+            const concatenatedIds = optionIds.join(',');
             setSelectedOpts(concatenatedIds);
         }
-
         fetchTripDetails();
 
     };
@@ -140,7 +139,6 @@ const Search = () => {
         };
         return `${formatName(city)}, ${formatName(country)}`;
     };
-
     // A PASSER EN BACK => findDistinctCategory
     const groupedOptions = useMemo(() => {
         const groups = {};
@@ -343,18 +341,19 @@ const Search = () => {
                         <div className="d-flex flex-wrap gap-3 justify-content-center">
                             {Object.entries(groupedOptions).map(([category, opts]) => {
                                 const selectOptions = opts.map(opt => ({
-                                    value: `${category}-${opt.optionid}`, // <--- unique value per category
-                                    optionid: opt.optionid,
+                                    value: `${category}-${opt.optionId}`, // <--- unique value per category
+                                    optionid: opt.optionId,
                                     label: `${opt.desc} (${opt.prix} €)`
                                 }));
 
                                 const selectedInCategory = optionsPreselected
-                                    .filter(id => opts.some(opt => opt.optionid === id))
-                                    .map(id => {
-                                        const opt = opts.find(o => o.optionid === id);
+                                    .filter(val => val.startsWith(category + '-')) // on garde uniquement ceux de la catégorie
+                                    .map(val => {
+                                        const optionid = val.split('-')[1];
+                                        const opt = opts.find(o => o.optionId.toString() === optionid);
                                         return {
-                                            value: `${category}-${opt.optionid}`, // match value
-                                            optionid: opt.optionid,
+                                            value: val,
+                                            optionid: opt.optionId,
                                             label: `${opt.desc} (${opt.prix} €)`
                                         };
                                     });
@@ -367,18 +366,14 @@ const Search = () => {
                                             options={selectOptions}
                                             value={selectedInCategory}
                                             onChange={(selected) => {
-                                                const selectedIds = Array.isArray(selected)
-                                                    ? selected.map(opt => opt.optionid)
+                                                const selectedValues = Array.isArray(selected)
+                                                    ? selected.map(opt => opt.value) // on récupère "category-optionid"
                                                     : [];
 
                                                 setOptionsPreselected(prev => {
-                                                    // Enlever les anciennes options de cette catégorie
-                                                    const remaining = prev.filter(id => {
-                                                        const opt = options.find(o => o.optionid === id);
-                                                        return opt?.category !== category;
-                                                    });
-
-                                                    return [...remaining, ...selectedIds];
+                                                    // On garde toutes les options hors de cette catégorie
+                                                    const remaining = prev.filter(val => !val.startsWith(category + '-'));
+                                                    return [...remaining, ...selectedValues];
                                                 });
                                             }}
                                             classNamePrefix="react-select"
