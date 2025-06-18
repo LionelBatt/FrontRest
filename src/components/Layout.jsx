@@ -9,7 +9,6 @@ const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const hoverTimeoutRef = useRef(null);
 
-  // Nettoyer le timeout quand le composant est démonté
   useEffect(() => {
     return () => {
       if (hoverTimeoutRef.current) {
@@ -23,8 +22,7 @@ const Layout = () => {
   };
 
   const handleMenuMouseEnter = () => {
-    console.log('Mouse enter on globe button'); // Debug
-    // Annuler le timeout de fermeture s'il existe
+    console.log('Mouse enter on globe button'); 
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
@@ -33,16 +31,15 @@ const Layout = () => {
   };
 
   const handleMenuMouseLeave = () => {
-    console.log('Mouse leave globe button'); // Debug
-    // Démarrer un timeout pour fermer la sidebar après un délai
+    console.log('Mouse leave globe button');
     hoverTimeoutRef.current = setTimeout(() => {
-      console.log('Closing sidebar after button leave timeout'); // Debug
+      console.log('Closing sidebar after button leave timeout'); 
       setSidebarOpen(false);
     }, 500); // 500ms de délai avant fermeture
   };
 
   const handleSidebarMouseEnter = () => {
-    console.log('Mouse enter on sidebar'); // Debug
+    console.log('Mouse enter on sidebar'); 
     // Annuler le timeout de fermeture quand on survole la sidebar
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -51,10 +48,10 @@ const Layout = () => {
   };
 
   const handleSidebarMouseLeave = () => {
-    console.log('Mouse leave sidebar'); // Debug
+    console.log('Mouse leave sidebar');
     // Démarrer un timeout pour fermer la sidebar après un délai
     hoverTimeoutRef.current = setTimeout(() => {
-      console.log('Closing sidebar after timeout'); // Debug
+      console.log('Closing sidebar after timeout');
       setSidebarOpen(false);
     }, 500); // 500ms de délai avant fermeture
   };

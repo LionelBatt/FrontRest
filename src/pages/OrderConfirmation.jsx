@@ -6,7 +6,6 @@ const OrderConfirmation = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Rediriger si pas de données de commande
         if (!location.state?.orderData) {
             navigate('/');
         }

@@ -17,7 +17,6 @@ const FicheVoyage = () => {
     const [showAllOptions, setShowAllOptions] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState({});
 
-    //Fonction pour attendre que Bootstrap soit chargé puis contrôler le carousel
     const goToSlide = (slideIndex) => {
         const waitForBootstrap = () => {
             if (window.bootstrap && window.bootstrap.Carousel) {
@@ -31,7 +30,6 @@ const FicheVoyage = () => {
                     console.error('Erreur lors du contrôle du carousel:', error);
                 }
             } else {
-                // Retry après un court délai si Bootstrap n'est pas encore chargé
                 setTimeout(waitForBootstrap, 100);
             }
         };
@@ -39,17 +37,16 @@ const FicheVoyage = () => {
         waitForBootstrap();
     };
 
-    // Charger les données du voyage avec le cache service
     useEffect(() => {
         const fetchTripDetails = async () => {
             try {
                 setLoading(true);
                 
-                const data = await CacheService.fetchWithCache(
-                    `trip_${id || 1}`,
-                    `http://13.39.150.189:8080/travel/trips/${id || 1}`,
-                    60
-                );
+                // Appel direct API sans cache pour les informations du voyage
+                const response = await fetch(`http://13.39.150.189:8080/travel/trips/${id || 1}`);
+                const result = await response.json();
+                const data = result.data || result;
+
                 
                 setTripData(data);
                 setTotalPrice(data.unitPrice);
@@ -72,7 +69,7 @@ const FicheVoyage = () => {
             const options = await CacheService.fetchWithCache(
                 'all_travel_options',
                 'http://13.39.150.189:8080/travel/options',
-                15
+                60
             );
 
             const includedOptionIds = tripData?.packageOptions?.map(opt => opt.optionId) || [];
@@ -165,22 +162,18 @@ const FicheVoyage = () => {
     };
 
     const handleAddToCart = () => {
-        // Vérifier si l'utilisateur est connecté
         const token = localStorage.getItem('token');
         
         if (!token) {
-            // Sauvegarder les données du voyage et options pour après connexion
             const cartData = {
                 trip: tripData,
                 selectedOptions: selectedOptions,
                 totalPrice: totalPrice
             };
             
-            // Sauvegarder temporairement dans sessionStorage (pas localStorage)
             sessionStorage.setItem('pendingCart', JSON.stringify(cartData));
             sessionStorage.setItem('redirectAfterLogin', `/trip/${id}`);
             
-            // Rediriger vers la page de connexion
             navigate('/login', { 
                 state: { 
                     message: 'Veuillez vous connecter pour ajouter ce voyage à votre panier.',
@@ -190,13 +183,9 @@ const FicheVoyage = () => {
             });
             return;
         }
-
-        // Utilisateur connecté : procéder normalement
-        // Vérifier s'il y a déjà un panier
         const existingCart = CartService.getCart();
         
         if (existingCart) {
-            // Demander confirmation pour remplacer le panier existant
             const confirmReplace = window.confirm(
                 `Vous avez déjà un voyage dans votre panier (${existingCart.trip.destinationCity}, ${existingCart.trip.destinationCountry}).\n\n` +
                 `Voulez-vous le remplacer par ce nouveau voyage ?\n\n` +
@@ -204,7 +193,7 @@ const FicheVoyage = () => {
             );
             
             if (!confirmReplace) {
-                return; // L'utilisateur a choisi de garder l'ancien panier
+                return;
             }
         }
 
@@ -213,11 +202,8 @@ const FicheVoyage = () => {
             selectedOptions: selectedOptions,
             totalPrice: totalPrice
         };
-
-        // Sauvegarder dans le localStorage (remplace l'ancien)
         CartService.saveCart(cartData);
 
-        // Naviguer vers la page panier avec les données
         navigate('/cart', { state: { cartData } });
     };
 

@@ -13,6 +13,11 @@ import VerifCode from './pages/VerifCode';
 import Cart from './pages/Cart';
 import OrderConfirmation from './pages/OrderConfirmation';
 import NotFound from './pages/NotFound';
+import LayoutAdmin from './backoffice/LayoutAdmin';
+import CrudT from './backoffice/CrudT';
+import CrudO from './backoffice/CrudO';
+import CrudU from './backoffice/CrudU';
+import Authenfication from './backoffice/Authenfication';
 
 function App() {
   return (
@@ -31,8 +36,17 @@ function App() {
             <Route path="/verification" element={<VerifCode />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
-            <Route path="*" element={<NotFound />} />
           </Route>
+
+
+          <Route path="/admin-login" element={<Authenfication/>}/>
+          <Route path="/admin" element={<LayoutAdmin />}>
+            <Route path="crudT" element={<CrudT />} />
+            <Route path="crudU" element={<CrudU />} />
+            <Route path="crudO" element={<CrudO />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
 
       </BrowserRouter>

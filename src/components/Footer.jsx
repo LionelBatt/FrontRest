@@ -32,13 +32,13 @@ function Footer() {
                             </p>
                             <div className="d-flex gap-3">
                                 <button className="glass-social-btn" title="Facebook">
-                                    <Facebook size={18} />
+                                    <Linkedin size={18} />
                                 </button>
                                 <button className="glass-social-btn" title="Twitter">
-                                    <Twitter size={18} />
+                                    <Linkedin size={18} />
                                 </button>
                                 <button className="glass-social-btn" title="Instagram">
-                                    <Instagram size={18} />
+                                    <Linkedin size={18} />
                                 </button>
                                 <button className="glass-social-btn" title="LinkedIn">
                                     <Linkedin size={18} />

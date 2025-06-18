@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import CartService from '../services/CartService';
 
 
-const Login = () => {
+const Authenfication = () => {
     const [inputs, setInputs] = useState({});
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -18,13 +17,6 @@ const Login = () => {
                 login: location.state.username || ''
             }));
         }
-
-        const cleanup = setTimeout(() => {
-            sessionStorage.removeItem('pendingCart');
-            sessionStorage.removeItem('redirectAfterLogin');
-        }, 10 * 60 * 1000);
-
-        return () => clearTimeout(cleanup);
     }, [location.state]);
 
     const handleChange = (event) => {
@@ -52,29 +44,11 @@ const Login = () => {
 
             const data = await response.json();
             
-            if (data.success) {
+            if (data.success && data.admin) {
                 localStorage.setItem("token", data.data);
                 console.log("Connexion réussie :", data);
                 window.dispatchEvent(new Event('loginStatusChanged'));
-                
-                const pendingCart = sessionStorage.getItem('pendingCart');
-                const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
-                
-                if (pendingCart) {
-                    const cartData = JSON.parse(pendingCart);
-                    CartService.saveCart(cartData);
-                    
-                    sessionStorage.removeItem('pendingCart');
-                    sessionStorage.removeItem('redirectAfterLogin');
-                    navigate('/cart', { state: { cartData } });
-                } else if (redirectAfterLogin) {
-                    sessionStorage.removeItem('redirectAfterLogin');
-                    navigate(redirectAfterLogin);
-                } else if (location.state?.redirectTo) {
-                    navigate(location.state.redirectTo);
-                } else {
-                    navigate('/');
-                }
+                navigate('/admin/crudT');
             } else {
                 if (data.data && typeof data.data === 'string') {
                     setError(data.data);
@@ -94,22 +68,6 @@ const Login = () => {
             <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
                 <div className="border rounded p-4 shadow" style={{ maxWidth: "400px", width: "100%" }}>
                     <h2 className="text-center mb-4">Identifiez-vous</h2>
-
-                    {/* Message d'information si redirection depuis panier */}
-                    {location.state?.message && (
-                        <div className="alert alert-info" role="alert">
-                            <i className="fas fa-info-circle me-2"></i>
-                            {location.state.message}
-                        </div>
-                    )}
-
-                    {/* Message de panier en attente */}
-                    {sessionStorage.getItem('pendingCart') && (
-                        <div className="alert alert-warning" role="alert">
-                            <i className="fas fa-shopping-cart me-2"></i>
-                            Vous avez un voyage en attente d'ajout au panier. Connectez-vous pour continuer.
-                        </div>
-                    )}
 
                     {error && (
                         <div className="alert alert-danger" role="alert">
@@ -143,23 +101,6 @@ const Login = () => {
                             />
                         </div>
 
-                        <div className="mb-3 text-end">
-                            <Link to="/resetpwd">Mot de passe oublié ?</Link>
-                        </div>
-
-                        <div className="form-check mb-3">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                name="remember"
-                                id="remember"
-                                onChange={handleChange}
-                            />
-                            <label className="form-check-label" htmlFor="remember">
-                                Remember me
-                            </label>
-                        </div>
-
                         <div className="d-grid mb-3">
                             <button 
                                 type="submit" 
@@ -177,10 +118,6 @@ const Login = () => {
                             </button>
                         </div>
                     </form>
-
-                    <div className="text-center">
-                        <Link to="/signup">Pas de compte ? Inscrivez-vous</Link>
-                    </div>
                 </div>
             </div>
         </>
@@ -188,4 +125,4 @@ const Login = () => {
 }
 
 
-export default Login;
+export default Authenfication;
