@@ -22,7 +22,7 @@ const AccParam = () => {
             }
 
             try {
-                const response = await fetch('http://15.188.48.92:8080/travel/users/profil', {
+                const response = await fetch('http://localhost:8080/travel/users/profil', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

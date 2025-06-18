@@ -27,7 +27,7 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
 
       const data = await CacheService.fetchWithCache(
         `trips_continent_${continent}`,
-        `http://15.188.48.92:8080/travel/trips/continent/${continent}`,
+        `http://localhost:8080/travel/trips/continent/${continent}`,
         30 // 30 minutes de cache
       );
 

@@ -48,7 +48,7 @@ const Header = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
     const token = localStorage.getItem("token");
     
     if (token) {
-      fetch("http://15.188.48.92:8080/travel/auth/signout", {
+      fetch("http://localhost:8080/travel/auth/signout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -42,8 +42,8 @@ const Search = () => {
         try {
             setLoading(true);
             const data = await CacheService.fetchWithCache(
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
 
@@ -71,7 +71,7 @@ const Search = () => {
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/countries")
+        fetch("http://localhost:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -84,7 +84,7 @@ const Search = () => {
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/cities")
+        fetch("http://localhost:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
