@@ -40,8 +40,8 @@ const Search = () => {
             const data = await CacheService.fetchWithCache(
                 // `http://15.188.48.92:8080/travel/trips/filter/null/null/null/1/9999/1/2/3/1/9999999`,
                 // `http://15.188.48.92:8080/travel/trips/filter/null/null/null/1/9999/1/2/3/1/9999999`,
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
             console.log("Data:", data);
@@ -58,7 +58,7 @@ const Search = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        fetch("http://localhost:8080/travel/destination/continents")
+        fetch("http://13.39.150.189:8080/travel/destination/continents")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -68,7 +68,7 @@ const Search = () => {
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/countries")
+        fetch("http://13.39.150.189:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -81,7 +81,7 @@ const Search = () => {
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/cities")
+        fetch("http://13.39.150.189:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);

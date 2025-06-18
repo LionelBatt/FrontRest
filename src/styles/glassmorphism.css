@@ -793,3 +793,19 @@
 }
 
 /* === RESPONSIVE === */
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.glass-order-item {
+  background: rgba(248,249,250,0.8);
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.glass-order-item:hover {
+  background: rgba(233,236,239,0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

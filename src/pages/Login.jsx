@@ -41,7 +41,7 @@ const Login = () => {
         console.log(inputs);
 
         try {
-            const response = await fetch("http://15.188.48.92:8080/travel/auth/signin", {
+            const response = await fetch("http://13.39.150.189:8080/travel/auth/signin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
