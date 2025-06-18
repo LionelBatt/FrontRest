@@ -42,8 +42,8 @@ const Search = () => {
         try {
             setLoading(true);
             const data = await CacheService.fetchWithCache(
-                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
 
@@ -417,7 +417,7 @@ const Search = () => {
                                         boxShadow: '0 12px 40px rgba(0, 0, 0, 0.2)',
                                         borderRadius: '20px'
                                     }}>
-                                        {/* LAYOUT PHOTO */}
+                                        {/* LAYOUT PHOTO ET DESCRIPTION */}
                                         <div className="row mb-4">
                                             {/* CAROUSEL PRINCIPAL */}
                                             <div className="col-lg-8">
@@ -521,12 +521,10 @@ const Search = () => {
                                                     </button>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                        {/* CONTENU PRINCIPAL */}
-                                        <div className="row">
-                                            <div className="col-md-8">
-                                                <div className="glass-card p-4 mb-4" style={{
+                                            
+                                            {/* DESCRIPTION À DROITE DU CAROUSEL */}
+                                            <div className="col-lg-4">
+                                                <div className="glass-card p-4 h-100" style={{
                                                     background: 'rgba(255, 255, 255, 0.12)',
                                                     backdropFilter: 'blur(15px)',
                                                     WebkitBackdropFilter: 'blur(15px)',
@@ -557,11 +555,36 @@ const Search = () => {
                                                             </li>
                                                         </ul>
                                                     </div>
+                                                    
+                                                    {/* Bouton pour voir la fiche voyage */}
+                                                    <div className="mt-4 d-flex justify-content-center">
+                                                        <button 
+                                                            className="btn btn-success px-4 py-2 fw-bold"
+                                                            onClick={() => navigate(`/trip/${tripData.id}`)}
+                                                            style={{
+                                                                background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                                                                border: 'none',
+                                                                borderRadius: '25px',
+                                                                boxShadow: '0 4px 15px rgba(40, 167, 69, 0.3)',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.target.style.transform = 'translateY(-2px)';
+                                                                e.target.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.4)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.target.style.transform = 'translateY(0)';
+                                                                e.target.style.boxShadow = '0 4px 15px rgba(40, 167, 69, 0.3)';
+                                                            }}
+                                                        >
+                                                            ✈️ Voir le voyage
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-
-
                                         </div>
+
+                                        {/* CONTENU PRINCIPAL - Cette section peut être supprimée ou utilisée pour d'autres contenus */}
                                     </div>
                                     {/* FIN WRAPPER GLASSMORPHISM CARD */}
                                 </div>

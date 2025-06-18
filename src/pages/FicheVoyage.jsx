@@ -44,7 +44,7 @@ const FicheVoyage = () => {
                 
                 const data = await CacheService.fetchWithCache(
                     `trip_${id || 1}`,
-                    `http://localhost:8080/travel/trips/${id || 1}`,
+                    `http://13.39.150.189:8080/travel/trips/${id || 1}`,
                     60
                 );
                 
@@ -68,7 +68,7 @@ const FicheVoyage = () => {
             
             const options = await CacheService.fetchWithCache(
                 'all_travel_options',
-                'http://localhost:8080/travel/options',
+                'http://13.39.150.189:8080/travel/options',
                 15
             );
 

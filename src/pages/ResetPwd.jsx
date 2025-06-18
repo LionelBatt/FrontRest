@@ -17,7 +17,6 @@ const ResetPwd = () => {
             return;
         }
 
-        // Validation basique de l'email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             setError('Veuillez saisir une adresse email valide');
@@ -27,8 +26,6 @@ const ResetPwd = () => {
         setIsLoading(true);
 
         try {
-            // Ici vous pouvez ajouter l'appel API pour envoyer le code de réinitialisation
-            // Pour l'instant, on simule l'envoi
             setTimeout(() => {
                 setIsLoading(false);
                 navigate('/verification', { state: { email } });
