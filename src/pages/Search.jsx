@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo  } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { MapPin, Globe, Building } from 'lucide-react';
@@ -22,9 +22,7 @@ const Search = () => {
     const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
     const [selectedMinPrice, setSelectedMinPrice] = useState(0);
     const [selectedMaxPrice, setSelectedMaxPrice] = useState(39999);
-    const [selectedOpt1, setSelectedOpt1] = useState(0);
-    const [selectedOpt2, setSelectedOpt2] = useState(0);
-    const [selectedOpt3, setSelectedOpt3] = useState(0);
+    const [selectedOpts, setSelectedOpts] = useState("-1");
     const [minimumDuration, setMinimumDuration] = useState(1);
     const [maximumDuration, setMaximumDuration] = useState(40);
 
@@ -33,6 +31,7 @@ const Search = () => {
     const [continents, setContinents] = useState();
     const [country, setCountry] = useState();
     const [city, setCity] = useState();
+    const [optionsPreselected, setOptionsPreselected] = useState([]);
     const [options, setOptions] = useState();
     const navigate = useNavigate();
     const [error, setError] = useState(null);
@@ -42,8 +41,8 @@ const Search = () => {
         try {
             setLoading(true);
             const data = await CacheService.fetchWithCache(
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
 
@@ -71,7 +70,7 @@ const Search = () => {
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/countries")
+        fetch("http://localhost:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -84,7 +83,7 @@ const Search = () => {
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
 
-        fetch("http://15.188.48.92:8080/travel/destination/cities")
+        fetch("http://localhost:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -94,6 +93,16 @@ const Search = () => {
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
 
+        fetch("http://localhost:8080/travel/options")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => setOptions(data))
+            .catch(err => console.error("Erreur de chargement des options", err));
+
         fetchTripDetails();
 
 
@@ -101,6 +110,11 @@ const Search = () => {
 
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
+        console.log(optionsPreselected);
+        if (optionsPreselected.length) {
+            const concatenatedIds = optionsPreselected.join(',');
+            setSelectedOpts(concatenatedIds);
+        }
 
         fetchTripDetails();
 
@@ -113,36 +127,28 @@ const Search = () => {
         return `${formatName(city)}, ${formatName(country)}`;
     };
 
-    const handleContinentClick = async (continent) => {
-        if (expandedContinent === continent) {
-            setExpandedContinent(null);
-            setExpandedCountry(null);
-            setSelectedCountry(null);
-            setSelectedCity(null);
-        } else {
-            setExpandedContinent(continent);
-            setExpandedCountry(null);
-            setSelectedCountry(null);
-            setSelectedCity(null);
-        }
-    };
+    // A PASSER EN BACK => findDistinctCategory
+    const groupedOptions = useMemo(() => {
+        const groups = {};
+        options?.forEach((opt) => {
+            if (!groups[opt.category]) {
+                groups[opt.category] = [];
+            }
+            groups[opt.category].push(opt);
+        });
+        return groups;
+    }, [options]);
 
-    const handleCountryClick = (country) => {
-        const countryKey = `${expandedContinent}_${country}`;
-
-        if (expandedCountry === countryKey) {
-            setExpandedCountry(null);
-            setSelectedCountry(null);
-        } else {
-            setExpandedCountry(countryKey);
-            setSelectedCountry(country);
-            setSelectedCity(null);
-        }
-    };
-
-    const handleCityClick = (city, country) => {
-        setSelectedCity(city);
-        setSelectedCountry(country);
+    const handleOptionChange = (e, category) => {
+        const selected = Array.from(e.target.optionsPreselected).map((opt) => parseInt(opt.value));
+        setOptionsPreselected((prev) => {
+            // Supprimer les anciennes options de cette catégorie
+            const filtered = prev.filter((id) => {
+                const option = options.find((o) => o.optionid === id);
+                return option?.category !== category;
+            });
+            return [...filtered, ...selected];
+        });
     };
 
     if (loading) return <p>Chargement...</p>;
@@ -330,6 +336,28 @@ const Search = () => {
                                     <span style={{ fontSize: "0.85rem" }}>{maximumDuration} jours</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="d-flex flex-wrap gap-3 justify-content-center">
+                            {Object.entries(groupedOptions).map(([category, opts]) => (
+                                <div key={category} className="glass-block p-3 rounded">
+                                    <label className="form-label fw-bold mb-2">{category}</label>
+                                    <select
+                                        multiple
+                                        className="form-select"
+                                        onChange={(e) => handleOptionChange(e, category)}
+                                        value={optionsPreselected.filter((id) =>
+                                            opts.some((o) => o.optionid === id)
+                                        )}
+                                        style={{ minWidth: '200px', height: '150px' }}
+                                    >
+                                        {opts.map((opt) => (
+                                            <option key={opt.optionid} value={opt.optionid}>
+                                                {opt.desc} ({opt.prix} €)
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ))}
                         </div>
                         <div className="d-flex justify-content-center gap-3 mb-4">
                             <button type="submit" className="btn btn-primary">Rechercher</button>
