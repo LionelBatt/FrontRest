@@ -41,13 +41,34 @@ const Search = () => {
         try {
             setLoading(true);
             const data = await CacheService.fetchWithCache(
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://15.188.48.92:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
 
 
             setTrips(data);
+            setMessage(data.message || "");
+
+        } catch (err) {
+            console.error('Erreur:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchOptions = async () => {
+        try {
+            setLoading(true);
+            const data = await CacheService.fetchWithCache(
+                `http://13.39.150.189:8080/travel/options`,
+                `http://13.39.150.189:8080/travel/options`,
+                60
+            );
+
+
+            setOptions(data);
             setMessage(data.message || "");
 
         } catch (err) {
@@ -93,15 +114,7 @@ const Search = () => {
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
 
-        fetch("http://localhost:8080/travel/options")
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => setOptions(data))
-            .catch(err => console.error("Erreur de chargement des options", err));
+        fetchOptions();
 
         fetchTripDetails();
 
