@@ -66,7 +66,7 @@ const Search = () => {
         try {
             setOptionsLoading(true);
             const data = await CacheService.fetchWithCache(
-                `cache_travel_options`,
+                `all_travel_options`,
                 `http://13.39.150.189:8080/travel/options`,
                 60
             );
