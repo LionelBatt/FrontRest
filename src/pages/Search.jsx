@@ -1,32 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo  } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { Package } from 'lucide-react';
+import { MapPin, Globe, Building } from 'lucide-react';
 import CacheService from '../services/CacheService';
+import ReactSlider from "react-slider";
 
 
 const Search = () => {
     const location = useLocation();
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [expandedContinent, setExpandedContinent] = useState(null);
+    const [expandedCountry, setExpandedCountry] = useState(null);
 
     const params = new URLSearchParams(location.search);
+    const [selectedContinentId, setSelectedContinentId] = useState("");
+    const [selectedCountryId, setSelectedCountryId] = useState("");
+    const [selectedCityId, setSelectedCityId] = useState("");
     const [selectedContinent, setSelectedContinent] = useState(params.get("continent") || "null");
     const [selectedCountry, setSelectedCountry] = useState(params.get("country") || "null");
     const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
     const [selectedMinPrice, setSelectedMinPrice] = useState(0);
-    const [selectedMaxPrice, setSelectedMaxPrice] = useState(9999999);
-    const [selectedOpt1, setSelectedOpt1] = useState(0);
-    const [selectedOpt2, setSelectedOpt2] = useState(0);
-    const [selectedOpt3, setSelectedOpt3] = useState(0);
-    const [minimumDuration, setMinimumDuration] = useState(0);
-    const [maximumDuration, setMaximumDuration] = useState(9999);
+    const [selectedMaxPrice, setSelectedMaxPrice] = useState(39999);
+    const [selectedOpts, setSelectedOpts] = useState("-1");
+    const [minimumDuration, setMinimumDuration] = useState(1);
+    const [maximumDuration, setMaximumDuration] = useState(40);
 
 
     const [price, setPrice] = useState(2500);
     const [continents, setContinents] = useState();
     const [country, setCountry] = useState();
     const [city, setCity] = useState();
+    const [optionsPreselected, setOptionsPreselected] = useState([]);
     const [options, setOptions] = useState();
     const navigate = useNavigate();
     const [error, setError] = useState(null);
@@ -35,16 +40,14 @@ const Search = () => {
     const fetchTripDetails = async () => {
         try {
             setLoading(true);
-            
-
             const data = await CacheService.fetchWithCache(
-                // `http://15.188.48.92:8080/travel/trips/filter/null/null/null/1/9999/1/2/3/1/9999999`,
-                // `http://15.188.48.92:8080/travel/trips/filter/null/null/null/1/9999/1/2/3/1/9999999`,
-                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpt1}/${selectedOpt2}/${selectedOpt3}/${selectedMinPrice}/${selectedMaxPrice}`,
+
                 60
             );
-            console.log("Data:", data);
+
+
             setTrips(data);
             setMessage(data.message || "");
 
@@ -68,7 +71,7 @@ const Search = () => {
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
 
-        fetch("http://13.39.150.189:8080/travel/destination/countries")
+        fetch("http://localhost:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -81,7 +84,7 @@ const Search = () => {
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
 
-        fetch("http://13.39.150.189:8080/travel/destination/cities")
+        fetch("http://localhost:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -91,6 +94,16 @@ const Search = () => {
             .then(data => setCity(data))
             .catch(err => console.error("Erreur de chargement des villes", err));
 
+        fetch("http://localhost:8080/travel/options")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => setOptions(data))
+            .catch(err => console.error("Erreur de chargement des options", err));
+
         fetchTripDetails();
 
 
@@ -98,6 +111,11 @@ const Search = () => {
 
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
+        console.log(optionsPreselected);
+        if (optionsPreselected.length) {
+            const concatenatedIds = optionsPreselected.join(',');
+            setSelectedOpts(concatenatedIds);
+        }
 
         fetchTripDetails();
 
@@ -110,150 +128,244 @@ const Search = () => {
         return `${formatName(city)}, ${formatName(country)}`;
     };
 
+    // A PASSER EN BACK => findDistinctCategory
+    const groupedOptions = useMemo(() => {
+        const groups = {};
+        options?.forEach((opt) => {
+            if (!groups[opt.category]) {
+                groups[opt.category] = [];
+            }
+            groups[opt.category].push(opt);
+        });
+        return groups;
+    }, [options]);
+
+    const handleOptionChange = (e, category) => {
+        const selected = Array.from(e.target.optionsPreselected).map((opt) => parseInt(opt.value));
+        setOptionsPreselected((prev) => {
+            // Supprimer les anciennes options de cette catégorie
+            const filtered = prev.filter((id) => {
+                const option = options.find((o) => o.optionid === id);
+                return option?.category !== category;
+            });
+            return [...filtered, ...selected];
+        });
+    };
+
     if (loading) return <p>Chargement...</p>;
     return (
         <>
             <div className="container" style={{ textAlign: "center" }}>
-                <h1 className="text-center mb-4">Voyages</h1>
+                <br /><br /><br />
 
-                {/* <!-- Carousel --> */}
                 <form onSubmit={handleSubmit}>
-                    <div id="demo" className="carousel slide" data-bs-ride="carousel">
-                        <div className="carousel-indicators">
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="0"
-                                className="active" title="Slide 1"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="1"
-                                title="Slide 2"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="2"
-                                title="Slide 3"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="3"
-                                title="Slide 4"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="4"
-                                title="Slide 5"></button>
+                    <div className="d-flex flex-column align-items-center justify-content-center flex-wrap gap-3 glass-top-bar mb-4 mt-3">
+                        <br />
+                        <div className="w-75 p-3 d-flex flex-wrap gap-3 glass-top-bar justify-content-center">
+                            {/* Select Continent */}
+                            <div className="glass-block p-2 rounded">
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <Globe size={16} />
+                                    <span style={{ color: "#222" }}>Continent</span>
+                                </div>
+                                <select
+                                    className="form-select"
+                                    value={selectedContinentId}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setSelectedContinentId(value);
+                                        setSelectedCountry("null");
+                                        setSelectedCity("null");
+                                        setSelectedContinent(continents.find(c => c.id === Number(value)).name);
+                                    }}
+                                >
+                                    <option value="" disabled>
+                                        Choisissez un continent
+                                    </option>
+                                    {continents?.map((continent) => (
+                                        <option key={continent.id} value={continent.id}>
+                                            {continent.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Select Pays */}
+                            {selectedContinentId && (
+                                <div className="glass-block p-2 rounded">
+                                    <div className="d-flex align-items-center gap-2 mb-2">
+                                        <MapPin size={16} className="text-success" />
+                                        <span style={{ color: "#222" }}>Pays</span>
+                                    </div>
+                                    <select
+                                        className="form-select"
+                                        value={selectedCountryId}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setSelectedCountryId(value);
+                                            setSelectedCountry(country.find(c => c.id === Number(value)).name);
+                                            setSelectedCity("null");
+                                        }}
+                                    >
+                                        <option value="" disabled>
+                                            Choisissez un pays
+                                        </option>
+                                        {country
+                                            ?.filter((c) => Math.floor(c.id / 10) === Number(selectedContinentId))
+                                            .map((pays) => (
+                                                <option key={pays.id} value={pays.id}>
+                                                    {pays.name}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* Select Ville */}
+                            {selectedCountryId && (
+                                <div className="glass-block p-2 rounded">
+                                    <div className="d-flex align-items-center gap-2 mb-2">
+                                        <Building size={16} className="text-info" />
+                                        <span style={{ color: "#222" }}>Ville</span>
+                                    </div>
+                                    <select
+                                        className="form-select"
+                                        value={selectedCityId}
+                                        onChange={(e) => {
+                                            setSelectedCityId(e.target.value);
+                                            setSelectedCity(city.find(c => c.id === Number(e.target.value)).name);
+                                        }}
+                                    >
+                                        <option value="" disabled>
+                                            Choisissez une ville
+                                        </option>
+                                        {city
+                                            ?.filter((v) => Math.floor(v.id / 10) === Number(selectedCountryId))
+                                            .map((ville) => (
+                                                <option key={ville.id} value={ville.id}>
+                                                    {ville.name}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                            )}
                         </div>
+                        <div className="d-flex justify-content-center gap-3 mb-4">
+                            <div className="glass-block price-slider p-4 rounded mb-4" style={{ width: "300px" }}>
+                                <label className="form-label mb-2">Budget ( {selectedMinPrice} € - {selectedMaxPrice} €)</label>
 
-                        <div className="carousel-inner">
-                            <div className="carousel-item active">
-                                <img src="../assets/images/asie.jpg" alt="Asie"
-                                    className="carousel-image"></img>
+                                <ReactSlider
+                                    className="glass-range"
+                                    thumbClassName="glass-thumb"
+                                    trackClassName="track"
+                                    renderTrack={(props, state) => {
+                                        let { key, style: propsStyle, ...restProps } = props;
+
+                                        let style = {
+                                            height: '6px',
+                                            borderRadius: '3px',
+                                        };
+
+                                        if (state.index === 1) {
+                                            // la sélection entre les deux curseurs
+                                            style.backgroundColor = '#007bff'; // bleu foncé par exemple
+                                        } else {
+                                            // rails gauche et droite
+                                            style.backgroundColor = '#d0d0d0'; // gris clair
+                                        }
+
+                                        return <div key={key} style={{ ...propsStyle, ...style }} {...restProps} />;
+                                    }}
+                                    min={0}
+                                    max={39999}
+                                    step={500}
+                                    value={[selectedMinPrice, selectedMaxPrice]}
+                                    onChange={([min, max]) => {
+                                        setSelectedMinPrice(min);
+                                        setSelectedMaxPrice(max);
+                                    }}
+                                    withTracks
+                                    pearling
+                                    minDistance={1000}
+                                />
+
+                                <div className="d-flex justify-content-between mt-2">
+                                    <span style={{ fontSize: "0.85rem" }}>{selectedMinPrice} €</span>
+                                    <span style={{ fontSize: "0.85rem" }}>{selectedMaxPrice} €</span>
+                                </div>
                             </div>
-                            <div className="carousel-item">
-                                <img src="../assets/images/AmeriqueN.jpg" alt="Amerique du Nord"
-                                    className="carousel-image"></img>
-                            </div>
-                            <div className="carousel-item">
-                                <img src="../assets/images/AmeriqueS.jpg" alt="Amerique du Sud"
-                                    className="carousel-image"></img>
-                            </div>
-                            <div className="carousel-item">
-                                <img src="../assets/images/Europe.jpg" alt="Europe"
-                                    className="carousel-image"></img>
-                            </div>
-                            <div className="carousel-item">
-                                <img src="../assets/images/Oceanie.jpg" alt="Oceanie"
-                                    className="carousel-image"></img>
+                            <div className="glass-block price-slider p-4 rounded mb-4" style={{ width: "300px" }}>
+                                <label className="form-label mb-2">Durée ( {minimumDuration} - {maximumDuration} jours)</label>
+
+                                <ReactSlider
+                                    className="glass-range"
+                                    thumbClassName="glass-thumb"
+                                    trackClassName="track"
+                                    renderTrack={(props, state) => {
+                                        let { key, style: propsStyle, ...restProps } = props;
+
+                                        let style = {
+                                            height: '6px',
+                                            borderRadius: '3px',
+                                        };
+
+                                        if (state.index === 1) {
+                                            // la sélection entre les deux curseurs
+                                            style.backgroundColor = '#007bff'; // bleu foncé par exemple
+                                        } else {
+                                            // rails gauche et droite
+                                            style.backgroundColor = '#d0d0d0'; // gris clair
+                                        }
+
+                                        return <div key={key} style={{ ...propsStyle, ...style }} {...restProps} />;
+                                    }}
+                                    min={1}
+                                    max={40}
+                                    step={2}
+                                    value={[minimumDuration, maximumDuration]}
+                                    onChange={([min, max]) => {
+                                        setMinimumDuration(min);
+                                        setMaximumDuration(max);
+                                    }}
+                                    withTracks
+                                    pearling
+                                    minDistance={3}
+                                />
+
+                                <div className="d-flex justify-content-between mt-2">
+                                    <span style={{ fontSize: "0.85rem" }}>{minimumDuration} jours</span>
+                                    <span style={{ fontSize: "0.85rem" }}>{maximumDuration} jours</span>
+                                </div>
                             </div>
                         </div>
-
-                        <button className="carousel-control-prev" type="button"
-                            data-bs-target="#demo" data-bs-slide="prev" title="Previous Slide">
-                            <span className="carousel-control-prev-icon"></span>
-                        </button>
-                        <button className="carousel-control-next" type="button"
-                            data-bs-target="#demo" data-bs-slide="next" title="Next Slide">
-                            <span className="carousel-control-next-icon"></span>
-                        </button>
-                    </div>
-
-                    <h2 className="text-center mb-4">Choisissez votre continent et votre
-                        pays de destination</h2>
-
-                    <div>
-                        {/* Select Continent */}
-                        <select
-                            value={selectedContinent}
-                            onChange={(e) => {
-                                setSelectedContinent(e.target.value);
-                                setSelectedCountry(""); // reset pays & ville si continent change
-                                setSelectedCity("");
-                            }}
-                        >
-                            <option value="" disabled>
-                                Choisissez un continent
-                            </option>
-                            {continents?.map((continent) => (
-                                <option key={continent.id} value={continent.id}>
-                                    {continent.name}
-                                </option>
+                        <div className="d-flex flex-wrap gap-3 justify-content-center">
+                            {Object.entries(groupedOptions).map(([category, opts]) => (
+                                <div key={category} className="glass-block p-3 rounded">
+                                    <label className="form-label fw-bold mb-2">{category}</label>
+                                    <select
+                                        multiple
+                                        className="form-select"
+                                        onChange={(e) => handleOptionChange(e, category)}
+                                        value={optionsPreselected.filter((id) =>
+                                            opts.some((o) => o.optionid === id)
+                                        )}
+                                        style={{ minWidth: '200px', height: '150px' }}
+                                    >
+                                        {opts.map((opt) => (
+                                            <option key={opt.optionid} value={opt.optionid}>
+                                                {opt.desc} ({opt.prix} €)
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             ))}
-                        </select>
-
-                        {/* Select Pays, filtré selon continent */}
-                        {selectedContinent && (
-                            <select
-                                value={selectedCountry}
-                                onChange={(e) => {
-                                    setSelectedCountry(e.target.value);
-                                    setSelectedCity(""); // reset ville si pays change
-                                }}
-                            >
-                                <option value="" disabled>
-                                    Choisissez un pays
-                                </option>
-                                {country
-                                    ?.filter((c) => Math.floor(c.id / 10) === Number(selectedContinent))
-                                    .map((pays) => (
-                                        <option key={pays.id} value={pays.id}>
-                                            {pays.name}
-                                        </option>
-                                    ))}
-                            </select>
-                        )}
-
-                        {/* Select Ville, filtrée selon pays */}
-                        {selectedCountry && (
-                            <select
-                                value={selectedCity}
-                                onChange={(e) => setSelectedCity(e.target.value)}
-                            >
-                                <option value="" disabled>
-                                    Choisissez une ville
-                                </option>
-                                {city
-                                    ?.filter((v) => Math.floor(v.id / 10) === Number(selectedCountry))
-                                    .map((ville) => (
-                                        <option key={ville.id} value={ville.id}>
-                                            {ville.name}
-                                        </option>
-                                    ))}
-                            </select>
-                        )}
+                        </div>
+                        <div className="d-flex justify-content-center gap-3 mb-4">
+                            <button type="submit" className="btn btn-primary">Rechercher</button>
+                        </div>
                     </div>
-                    <h2 className="text-center mb-4">Choisissez votre budget pour votre
-                        voyage</h2>
-                    <div className="price-slider d-flex justify-content-center align-items-center gap-3">
-                        <label htmlFor="prix" className="form-label mb-0">
-                            Prix maximum :
-                        </label>
-                        <input
-                            type="range"
-                            id="prix"
-                            name="prix"
-                            min="500"
-                            max="5000"
-                            value={price}
-                            step="100"
-                            className="form-range"
-                            style={{ width: "200px" }}
-                            onChange={(e) => setPrice(e.target.value)}
-                        />
-                        <output name="outputPrix" id="outputPrix">
-                            {price} €
-                        </output>
-                    </div>
-                    <br />
-                    <button type="submit" className="btn btn-primary">Rechercher</button>
                 </form>
+
             </div>
             {trips.length > 0 &&
                 <>

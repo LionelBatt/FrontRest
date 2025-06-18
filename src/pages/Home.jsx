@@ -1,6 +1,16 @@
+import SearchBar from "../components/SearchBar";
+import { useNavigate } from 'react-router-dom';
+
 
 
 function Home() {
+    const navigate = useNavigate();
+
+    
+    const handleReservation = (tripId) => {
+        navigate(`/trip/${tripId}`);
+    };
+
     return (
         <>
         <div className="position-relative">
@@ -17,7 +27,14 @@ function Home() {
                             <div className="carousel-caption text-start">
                                 <h1>New-York 🗽</h1>
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac velit tincidunt, euismod nisi dignissim, sodales tellus. Praesent tincidunt turpis non sem imperdiet, eget sollicitudin purus ultricies. Mauris id felis in nisi tincidunt sodales.</p>
-                                <p><a className="btn btn-lg btn-primary" href="#">Réserver</a></p>
+                                <p>
+                                    <button 
+                                        className="btn btn-lg btn-primary" 
+                                        onClick={() => handleReservation(16)}
+                                    >
+                                        Réserver
+                                    </button>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -27,7 +44,14 @@ function Home() {
                             <div className="carousel-caption text-start">
                                 <h1>Tokyo 🌆</h1>
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac velit tincidunt, euismod nisi dignissim, sodales tellus. Praesent tincidunt turpis non sem imperdiet, eget sollicitudin purus ultricies. Mauris id felis in nisi tincidunt sodales.</p>
-                                <p><a className="btn btn-lg btn-primary" href="fiche-Tokyo.html">Réserver</a></p>
+                                <p>
+                                    <button 
+                                        className="btn btn-lg btn-primary" 
+                                        onClick={() => handleReservation(9)}
+                                    >
+                                        Réserver
+                                    </button>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -37,7 +61,14 @@ function Home() {
                             <div className="carousel-caption text-start">
                                 <h1>Paris🗼</h1>
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac velit tincidunt, euismod nisi dignissim, sodales tellus. Praesent tincidunt turpis non sem imperdiet, eget sollicitudin purus ultricies. Mauris id felis in nisi tincidunt sodales.</p>
-                                <p><a className="btn btn-lg btn-primary" href="#">Réserver</a></p>
+                                <p>
+                                    <button 
+                                        className="btn btn-lg btn-primary" 
+                                        onClick={() => handleReservation(1)}
+                                    >
+                                        Réserver
+                                    </button>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -52,10 +83,12 @@ function Home() {
                     <span className="visually-hidden">Suivant</span>
                 </button>
             </div>
-            <div className="p-5 mb-4 bg-light rounded-3">
-                <div className="container-fluid py-5">
-                    <h1 className="display-5 fw-bold">Qui sommes nous</h1>
-                    <p className="col-md-8">
+            <SearchBar/>
+            <div class="p-5 mb-4 bg-light rounded-3">
+                <div class="container-fluid py-5">
+                    <h1 class="display-5 fw-bold">Qui sommes nous</h1><br/>
+                    <p class="col-md-8">
+
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac velit tincidunt, euismod nisi dignissim, sodales tellus. Praesent tincidunt turpis non sem imperdiet, eget sollicitudin purus ultricies. Mauris id felis in nisi tincidunt sodales. Nulla egestas orci et nibh pulvinar vehicula. Fusce volutpat mi ac sem maximus vehicula. In aliquam egestas ex, at malesuada nulla vehicula quis. Etiam consectetur metus nisi, sit amet pharetra nibh laoreet ut. Sed cursus eros molestie metus vulputate, et porta turpis viverra. Vivamus nec vehicula arcu.
                         Donec ut nisl id orci auctor aliquet quis non enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam consequat diam at rutrum luctus. Vivamus sapien augue, tempor ut imperdiet sed, congue in felis. Sed ex lorem, aliquet eu condimentum non, fermentum et erat. Duis convallis orci ut dignissim sollicitudin. Fusce vel tempus arcu, pharetra volutpat nisl. </p>
                 </div>
@@ -63,12 +96,11 @@ function Home() {
             <div className="p-5 mb-4 bg-light rounded-3">
                 <div className="container-fluid py-5">
                     <div className="d-flex justify-content-end">
-                        <h1 className="display-5 fw-bold">Lorem ipsum</h1>
+                        <h1 className="display-5 fw-bold">Nos Services</h1>
                     </div>
                     <p className="text-end">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In ac velit tincidunt, euismod nisi dignissim, sodales tellus. Praesent tincidunt turpis non sem imperdiet, eget sollicitudin purus ultricies. Mauris id felis in nisi tincidunt sodales. Nulla egestas orci et nibh pulvinar vehicula. Fusce volutpat mi ac sem maximus vehicula. In aliquam egestas ex, at malesuada nulla vehicula quis. Etiam consectetur metus nisi, sit amet pharetra nibh laoreet ut. Sed cursus eros molestie metus vulputate, et porta turpis viverra. Vivamus nec vehicula arcu.
-                        Donec ut nisl id orci auctor aliquet quis non enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam consequat diam at rutrum luctus. Vivamus sapien augue, tempor ut imperdiet sed, congue in felis. Sed ex lorem, aliquet eu condimentum non, fermentum et erat. Duis convallis orci ut dignissim sollicitudin. Fusce vel tempus arcu, pharetra volutpat nisl.
-                    </p>
+                      Pour enrichir votre expérience, nous proposons une gamme complète de services premium : guide privé multilingue pour des découvertes culturelles approfondies, demi-pension avec petit-déjeuner et dîner dans les meilleurs établissements, assurance voyage premium pour voyager l'esprit tranquille, participation à des cérémonies traditionnelles locales, cours de cuisine locale avec des chefs renommés, séances de hammam traditionnel, package culturel et patrimoine avec accès privilégié aux sites historiques, tour en hélicoptère de 30 minutes pour des vues spectaculaires, service de limousine avec chauffeur privé, conciergerie 24h/24 pour répondre à tous vos besoins, et surclassement en classe affaires pour un confort optimal durant vos vols.
+                         </p>
                 </div>
             </div>
             <div className="container mt-5">
@@ -94,4 +126,4 @@ function Home() {
     )
 }
 
-export default Home;
+export default Home; 
