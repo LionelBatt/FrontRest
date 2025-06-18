@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { MapPin, Globe, Building } from 'lucide-react';
 import CacheService from '../services/CacheService';
 import ReactSlider from "react-slider";
+import Select from 'react-select';
 
 
 const Search = () => {
@@ -22,7 +23,7 @@ const Search = () => {
     const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
     const [selectedMinPrice, setSelectedMinPrice] = useState(0);
     const [selectedMaxPrice, setSelectedMaxPrice] = useState(39999);
-    const [selectedOpts, setSelectedOpts] = useState("-1");
+    const [selectedOpts, setSelectedOpts] = useState("0");
     const [minimumDuration, setMinimumDuration] = useState(1);
     const [maximumDuration, setMaximumDuration] = useState(40);
 
@@ -41,8 +42,8 @@ const Search = () => {
         try {
             setLoading(true);
             const data = await CacheService.fetchWithCache(
-                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
-                `http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
+                `http://localhost:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`,
                 60
             );
 
@@ -124,7 +125,7 @@ const Search = () => {
     const handleSubmit = (event) => {
         if (event) event.preventDefault();
         console.log(optionsPreselected);
-        if (optionsPreselected.length) {
+        if (optionsPreselected.length>0) {
             const concatenatedIds = optionsPreselected.join(',');
             setSelectedOpts(concatenatedIds);
         }
@@ -149,20 +150,9 @@ const Search = () => {
             }
             groups[opt.category].push(opt);
         });
+        console.log(groups);
         return groups;
     }, [options]);
-
-    const handleOptionChange = (e, category) => {
-        const selected = Array.from(e.target.optionsPreselected).map((opt) => parseInt(opt.value));
-        setOptionsPreselected((prev) => {
-            // Supprimer les anciennes options de cette catégorie
-            const filtered = prev.filter((id) => {
-                const option = options.find((o) => o.optionid === id);
-                return option?.category !== category;
-            });
-            return [...filtered, ...selected];
-        });
-    };
 
     if (loading) return <p>Chargement...</p>;
     return (
@@ -351,26 +341,51 @@ const Search = () => {
                             </div>
                         </div>
                         <div className="d-flex flex-wrap gap-3 justify-content-center">
-                            {Object.entries(groupedOptions).map(([category, opts]) => (
-                                <div key={category} className="glass-block p-3 rounded">
-                                    <label className="form-label fw-bold mb-2">{category}</label>
-                                    <select
-                                        multiple
-                                        className="form-select"
-                                        onChange={(e) => handleOptionChange(e, category)}
-                                        value={optionsPreselected.filter((id) =>
-                                            opts.some((o) => o.optionid === id)
-                                        )}
-                                        style={{ minWidth: '200px', height: '150px' }}
-                                    >
-                                        {opts.map((opt) => (
-                                            <option key={opt.optionid} value={opt.optionid}>
-                                                {opt.desc} ({opt.prix} €)
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ))}
+                            {Object.entries(groupedOptions).map(([category, opts]) => {
+                                const selectOptions = opts.map(opt => ({
+                                    value: `${category}-${opt.optionid}`, // <--- unique value per category
+                                    optionid: opt.optionid,
+                                    label: `${opt.desc} (${opt.prix} €)`
+                                }));
+
+                                const selectedInCategory = optionsPreselected
+                                    .filter(id => opts.some(opt => opt.optionid === id))
+                                    .map(id => {
+                                        const opt = opts.find(o => o.optionid === id);
+                                        return {
+                                            value: `${category}-${opt.optionid}`, // match value
+                                            optionid: opt.optionid,
+                                            label: `${opt.desc} (${opt.prix} €)`
+                                        };
+                                    });
+
+                                return (
+                                    <div key={category} className="glass-block p-3 rounded" style={{ minWidth: '300px' }}>
+                                        <label className="form-label fw-bold mb-2">{category}</label>
+                                        <Select
+                                            isMulti
+                                            options={selectOptions}
+                                            value={selectedInCategory}
+                                            onChange={(selected) => {
+                                                const selectedIds = Array.isArray(selected)
+                                                    ? selected.map(opt => opt.optionid)
+                                                    : [];
+
+                                                setOptionsPreselected(prev => {
+                                                    // Enlever les anciennes options de cette catégorie
+                                                    const remaining = prev.filter(id => {
+                                                        const opt = options.find(o => o.optionid === id);
+                                                        return opt?.category !== category;
+                                                    });
+
+                                                    return [...remaining, ...selectedIds];
+                                                });
+                                            }}
+                                            classNamePrefix="react-select"
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                         <div className="d-flex justify-content-center gap-3 mb-4">
                             <button type="submit" className="btn btn-primary">Rechercher</button>
