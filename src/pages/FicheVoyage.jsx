@@ -42,27 +42,10 @@ const FicheVoyage = () => {
             try {
                 setLoading(true);
                 
-                // Vérifier si cette fiche a déjà été consultée
-                const hasBeenViewed = CacheService.get(`trip_${id || 1}`) !== null;
-                
-                let data;
-                if (hasBeenViewed) {
-                    console.log(`📦 Utilisation du cache pour trip_${id}`);
-                    data = await CacheService.fetchWithCache(
-                        `trip_${id || 1}`,
-                        `http://13.39.150.189:8080/travel/trips/${id || 1}`,
-                        30 // 30 minutes
-                    );
-                } else {
-                    console.log(`🌐 Premier chargement pour trip_${id}`);
-                    const response = await fetch(`http://13.39.150.189:8080/travel/trips/${id || 1}`);
-                    const result = await response.json();
-                    data = result.data || result;
-                    
-                    if (data) {
-                        CacheService.set(`trip_${id || 1}`, data, 30);
-                    }
-                }
+                // Appel direct API sans cache pour les informations du voyage
+                const response = await fetch(`http://13.39.150.189:8080/travel/trips/${id || 1}`);
+                const result = await response.json();
+                const data = result.data || result;
                 
                 setTripData(data);
                 setTotalPrice(data.unitPrice);
@@ -83,9 +66,9 @@ const FicheVoyage = () => {
             setOptionsLoading(true);
             
             const options = await CacheService.fetchWithCache(
-                'travel_options',
+                'all_travel_options',
                 'http://13.39.150.189:8080/travel/options',
-                30 // TTL de 30 minutes
+                60
             );
 
             const includedOptionIds = tripData?.packageOptions?.map(opt => opt.optionId) || [];
@@ -97,7 +80,6 @@ const FicheVoyage = () => {
             
         } catch (err) {
             console.error('Erreur lors du chargement des options:', err);
-            setAllOptions([]);
         } finally {
             setOptionsLoading(false);
         }
@@ -570,7 +552,7 @@ const FicheVoyage = () => {
                                             <>
                                                 <Settings size={18} />
                                                 Options supplémentaires
-                                                {CacheService.get('travel_options') && (
+                                                {CacheService.get('all_travel_options') && (
                                                     <span className="glass-badge ms-2">{allOptions.length}</span>
                                                 )}
                                             </>

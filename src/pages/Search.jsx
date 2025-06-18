@@ -42,10 +42,10 @@ const Search = () => {
     const [optionsLoading, setOptionsLoading] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState({});
 
+
     const fetchTripDetails = async () => {
         try {
             setLoading(true);
-            // SUPPRESSION DU CACHE pour les recherches - Appel direct API
             const response = await fetch(`http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`);
             const result = await response.json();
             const data = result.data || result || [];
@@ -65,44 +65,60 @@ const Search = () => {
     const fetchOptions = async () => {
         try {
             setOptionsLoading(true);
-            // GARDE LE CACHE pour les options (données stables)
             const data = await CacheService.fetchWithCache(
-                'travel_options',
-                'http://13.39.150.189:8080/travel/options',
-                30 // 30 minutes
+                `all_travel_options`,
+                `http://13.39.150.189:8080/travel/options`,
+                60
             );
 
             setOptions(data);
+            setMessage(data.message || "");
 
         } catch (err) {
             console.error('Erreur:', err);
             setError(err.message);
-            setOptions([]);
         } finally {
             setOptionsLoading(false);
         }
     };
 
     useEffect(() => {
-        const loadInitialData = async () => {
-            try {
-                const [continentsData, countriesData, citiesData] = await Promise.all([
-                    CacheService.fetchWithCache('continents', 'http://13.39.150.189:8080/travel/destination/continents', 30), // 30 minutes
-                    CacheService.fetchWithCache('countries', 'http://13.39.150.189:8080/travel/destination/countries', 30), // 30 minutes
-                    CacheService.fetchWithCache('cities', 'http://13.39.150.189:8080/travel/destination/cities', 30) // 30 minutes
-                ]);
+        const token = localStorage.getItem("token");
+        fetch("http://13.39.150.189:8080/travel/destination/continents")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => setContinents(data))
+            .catch(err => console.error("Erreur de chargement des continents", err));
 
-                setContinents(continentsData);
-                setCountry(countriesData);
-                setCity(citiesData);
-            } catch (err) {
-                console.error('Erreur chargement données initiales:', err);
-                setError(err.message);
-            }
-        };
+        fetch("http://13.39.150.189:8080/travel/destination/countries")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Pays reçus :", data);
+                setCountry(data);
+            })
+            .catch(err => console.error("Erreur de chargement des pays", err));
 
-        loadInitialData();
+        fetch("http://13.39.150.189:8080/travel/destination/cities")
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => setCity(data))
+            .catch(err => console.error("Erreur de chargement des villes", err));
+
         fetchOptions();
+
         fetchTripDetails();
     }, [selectedOpts]);
 
