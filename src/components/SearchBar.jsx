@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Building, Search, ChevronRight } from 'lucide-react';
 import CacheService from '../services/CacheService';
 
-const SearchBar = () => {
+const SearchBar = ({ isInHeader = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOption, setSelectedOption] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -124,8 +124,11 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="position-absolute top-50 end-0 translate-middle-y" 
-         style={{ 
+    <div className={isInHeader ? "position-relative" : "position-absolute top-50 end-0 translate-middle-y"} 
+         style={isInHeader ? { 
+           width: '100%',
+           maxWidth: '400px'
+         } : { 
            zIndex: 1030, 
            right: '2rem', 
            maxWidth: '300px',
@@ -135,11 +138,11 @@ const SearchBar = () => {
          }}>
       <div className="position-relative">
         <form onSubmit={handleSubmit}>
-          <div className={`d-flex align-items-center bg-white rounded-pill shadow-sm ${
+          <div className={`d-flex align-items-center ${isInHeader ? 'bg-white' : 'bg-white'} rounded-pill shadow-sm ${
             isFocused ? 'border-primary border-2' : 'border'
           }`} style={{ 
-            height: '45px',
-            backgroundColor: '#e8f5e9'
+            height: '40px',
+            backgroundColor: isInHeader ? 'rgba(255, 255, 255, 0.9)' : '#e8f5e9'
           }}>
             <input
               type="text"

@@ -32,7 +32,7 @@ const Search = () => {
     const [country, setCountry] = useState();
     const [city, setCity] = useState();
     const [optionsPreselected, setOptionsPreselected] = useState([]);
-    const [options, setOptions] = useState();
+    const [options, setOptions] = useState([]);
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const [message, setMessage] = useState(null);
@@ -83,7 +83,6 @@ const Search = () => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
         fetch("http://13.39.150.189:8080/travel/destination/continents")
             .then(res => {
                 if (!res.ok) {
@@ -106,7 +105,6 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-
         fetch("http://13.39.150.189:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
@@ -201,7 +199,12 @@ const Search = () => {
 
     const groupOptionsByCategory = (options) => {
         const groups = {};
-        options?.forEach((opt) => {
+        // Vérifier que options est un tableau avant d'utiliser forEach
+        if (!options || !Array.isArray(options)) {
+            return groups;
+        }
+        
+        options.forEach((opt) => {
             if (!groups[opt.category]) {
                 groups[opt.category] = [];
             }
@@ -490,7 +493,7 @@ const Search = () => {
                                                     )}
                                                 </div>
                                                 
-                                                {Object.entries(groupOptionsByCategory(options)).map(([category, categoryOptions]) => (
+                                                {options && Array.isArray(options) && Object.entries(groupOptionsByCategory(options)).map(([category, categoryOptions]) => (
                                                     <div key={category} className="mb-3">
                                                         <button
                                                             onClick={() => toggleCategoryExpansion(category)}
