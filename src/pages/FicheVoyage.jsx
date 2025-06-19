@@ -46,6 +46,7 @@ const FicheVoyage = () => {
                 const response = await fetch(`http://13.39.150.189:8080/travel/trips/${id || 1}`);
                 const result = await response.json();
                 const data = result.data || result;
+
                 
                 setTripData(data);
                 setTotalPrice(data.unitPrice);
