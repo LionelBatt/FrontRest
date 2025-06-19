@@ -41,7 +41,7 @@ const Search = () => {
     const fetchTripDetails = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://13.39.150.189:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`);
+            const response = await fetch(`http://13.38.218.50:8080/travel/trips/filter/${selectedContinent}/${selectedCountry}/${selectedCity}/${minimumDuration}/${maximumDuration}/${selectedOpts}/${selectedMinPrice}/${selectedMaxPrice}`);
             const result = await response.json();
             const data = result.data || result || [];
 
@@ -60,7 +60,7 @@ const Search = () => {
             setOptionsLoading(true);
             const data = await CacheService.fetchWithCache(
                 `all_travel_options`,
-                `http://13.39.150.189:8080/travel/options`,
+                `http://13.38.218.50:8080/travel/options`,
                 60
             );
 
@@ -74,7 +74,7 @@ const Search = () => {
     };
 
     useEffect(() => {
-        fetch("http://13.39.150.189:8080/travel/destination/continents")
+        fetch("http://13.38.218.50:8080/travel/destination/continents")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -84,7 +84,7 @@ const Search = () => {
             .then(data => setContinents(data))
             .catch(err => console.error("Erreur de chargement des continents", err));
 
-        fetch("http://13.39.150.189:8080/travel/destination/countries")
+        fetch("http://13.38.218.50:8080/travel/destination/countries")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -96,7 +96,7 @@ const Search = () => {
                 setCountry(data);
             })
             .catch(err => console.error("Erreur de chargement des pays", err));
-        fetch("http://13.39.150.189:8080/travel/destination/cities")
+        fetch("http://13.38.218.50:8080/travel/destination/cities")
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -109,7 +109,7 @@ const Search = () => {
         fetchOptions();
 
         fetchTripDetails();
-    }, [selectedOpts,fetchTripDetails()]);
+    }, [selectedOpts]);
 
     const handleSubmit = (event) => {
         if (event) event.preventDefault();

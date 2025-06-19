@@ -36,7 +36,7 @@ function CrudT() {
     unitPrice: ""
   });
 
-  const BASE_URL = "http://13.39.150.189:8080/travel/trips";
+  const BASE_URL = "http://13.38.218.50:8080/travel/trips";
 
   const loadAll = async () => {
     const res = await fetch(BASE_URL);
@@ -279,7 +279,7 @@ function CrudT() {
     unitPrice: ""
   });
 
-  const BASE_URL = "http://13.39.150.189:8080/travel/trips";
+  const BASE_URL = "http://13.38.218.50:8080/travel/trips";
 
   const loadAll = async () => {
     const res = await fetch(BASE_URL);

@@ -33,7 +33,7 @@ const HeaderAdmin = () => {
         const token = localStorage.getItem("token");
 
         if (token) {
-            fetch("http://13.39.150.189:8080/travel/auth/signout", {
+            fetch("http://13.38.218.50:8080/travel/auth/signout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

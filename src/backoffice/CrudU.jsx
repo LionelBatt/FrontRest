@@ -27,7 +27,7 @@ function CrudU() {
     const loadAll = async () => {
         try {
             console.log(token)
-            const res = await fetch("http://13.39.150.189:8080/travel/users", {
+            const res = await fetch("http://13.38.218.50:8080/travel/users", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -48,7 +48,7 @@ function CrudU() {
         }
 
         try {
-            const res = await fetch("http://13.39.150.189:8080/travel/auth/signup", {
+            const res = await fetch("http://13.38.218.50:8080/travel/auth/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,7 +73,7 @@ function CrudU() {
     const findById = async () => {
         try {
             console.log("token : " + token)
-            const res = await fetch(`http://13.39.150.189:8080/travel/users/${userId}`, {
+            const res = await fetch(`http://13.38.218.50:8080/travel/users/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -89,7 +89,7 @@ function CrudU() {
 
     const update = async () => {
         try {
-            const res = await fetch(`http://13.39.150.189:8080/travel/users/${userId}`, {
+            const res = await fetch(`http://13.38.218.50:8080/travel/users/${userId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -112,7 +112,7 @@ function CrudU() {
 
     const remove = async () => {
         try {
-            const res = await fetch(`http://13.39.150.189:8080/travel/users/${userId}`, {
+            const res = await fetch(`http://13.38.218.50:8080/travel/users/${userId}`, {
                 method: "DELETE",
                 headers: {
                     'Authorization': `Bearer ${token}`
