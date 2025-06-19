@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import CartService from '../services/CartService';
 import '../styles/glassmorphism.css';
 
-const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
+const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave, setView }) => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
   const [cartSummary, setCartSummary] = useState(null);
   const [showCartModal, setShowCartModal] = useState(false);
+  
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -155,6 +156,33 @@ const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
               }}
             ></span>
           </button>
+          {/*}      
+        <div className="flex gap-4">
+            <button
+              onClick={() => setView('trips')}
+              className="btn glass-btn-danger glass-border-radius-lg glass-text-white" 
+                    style={{
+                      fontWeight: '500',
+                      padding: '0.5rem 1rem',
+                      backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      border: 'none',
+                    }}   >
+              Gérer les Voyages
+            </button>
+            <button
+              onClick={() => setView('users')}
+              className="btn glass-btn-danger glass-border-radius-lg glass-text-white" 
+                    style={{
+                      fontWeight: '500',
+                      padding: '0.5rem 1rem',
+                      
+                      backdropFilter: 'blur(10px)',
+                      border: 'none',
+                    }}>
+              Gérer les Utilisateurs
+            </button>
+          </div>*/}
 
           <div className="collapse navbar-collapse" id="navbarCollapse">
             <form className="d-flex ms-auto gap-2 align-items-center">
