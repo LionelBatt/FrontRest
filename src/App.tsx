@@ -18,6 +18,7 @@ import CrudT from './backoffice/CrudT';
 import CrudO from './backoffice/CrudO';
 import CrudU from './backoffice/CrudU';
 import Authenfication from './backoffice/Authenfication';
+import ProtectedRoute from './backoffice/ProtectedRoute';
 
 function App() {
   return (
@@ -39,11 +40,13 @@ function App() {
           </Route>
 
 
-          <Route path="/admin-login" element={<Authenfication/>}/>
+          <Route path="/admin-login" element={<Authenfication />} />
           <Route path="/admin" element={<LayoutAdmin />}>
-            <Route path="crudT" element={<CrudT />} />
-            <Route path="crudU" element={<CrudU />} />
-            <Route path="crudO" element={<CrudO />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="crudT" element={<CrudT />} />
+              <Route path="crudU" element={<CrudU />} />
+              <Route path="crudO" element={<CrudO />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFound />} />
