@@ -1,10 +1,8 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import '../styles/glassmorphism.css';
 
 const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
-    const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const location = useLocation();
     const currentPath = location.pathname;
@@ -14,7 +12,6 @@ const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
     useEffect(() => {
         const checkLoginStatus = () => {
             const token = localStorage.getItem("token");
-            setIsLoggedIn(!!token);
         };
 
         checkLoginStatus();
@@ -50,7 +47,6 @@ const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
                 .catch(err => console.error("Erreur lors de la déconnexion :", err))
                 .finally(() => {
                     localStorage.removeItem("token");
-                    setIsLoggedIn(false);
                     console.log("Token supprimé et utilisateur déconnecté");
 
                     window.dispatchEvent(new Event('loginStatusChanged'));
