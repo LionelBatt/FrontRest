@@ -3,11 +3,9 @@ import LoadingBar from "../components/LoadingBar";
 import HeaderAdmin from "./HeaderAdmin";
 
 const LayoutAdmin = () => {
-
   return (
     <>
-      <HeaderAdmin 
-      />
+      <HeaderAdmin />
       <LoadingBar />
       <main>
         <Outlet />

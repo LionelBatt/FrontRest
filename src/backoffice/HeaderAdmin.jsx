@@ -1,8 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import '../styles/glassmorphism.css';
 
-const HeaderAdmin = ({ onMenuClick, onMenuMouseEnter, onMenuMouseLeave }) => {
+const HeaderAdmin = () => {
 
     const location = useLocation();
     const currentPath = location.pathname;
