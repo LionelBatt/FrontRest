@@ -19,10 +19,10 @@ const Search = () => {
     const [selectedCountry, setSelectedCountry] = useState(params.get("country") || "null");
     const [selectedCity, setSelectedCity] = useState(params.get("city") || "null");
     const [selectedMinPrice, setSelectedMinPrice] = useState(0);
-    const [selectedMaxPrice, setSelectedMaxPrice] = useState(39999);
+    const [selectedMaxPrice, setSelectedMaxPrice] = useState(9999);
     const [selectedOpts, setSelectedOpts] = useState("0");
     const [minimumDuration, setMinimumDuration] = useState(1);
-    const [maximumDuration, setMaximumDuration] = useState(40); 
+    const [maximumDuration, setMaximumDuration] = useState(30); 
 
 
     const [continents, setContinents] = useState();
@@ -211,7 +211,20 @@ const Search = () => {
         return `${formatName(city)}, ${formatName(country)}`;
     };
 
-    if (loading) return <p>Chargement...</p>;
+    if (loading) {
+        return (
+            <div className="container d-flex justify-content-center align-items-center" style={{minHeight: '50vh'}}>
+                <div className="glass-card p-4">
+                    <div className="d-flex align-items-center gap-3">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Chargement...</span>
+                        </div>
+                        <span className="glass-text-dark-green">Chargement de la page...</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     return (
         <>
             <div className="container" style={{ textAlign: "center" }}>
@@ -339,8 +352,8 @@ const Search = () => {
                                         return <div key={key} style={{ ...propsStyle, ...style }} {...restProps} />;
                                     }}
                                     min={0}
-                                    max={39999}
-                                    step={500}
+                                    max={9999}
+                                    step={250}
                                     value={[selectedMinPrice, selectedMaxPrice]}
                                     onChange={([min, max]) => {
                                         setSelectedMinPrice(min);
@@ -348,7 +361,7 @@ const Search = () => {
                                     }}
                                     withTracks
                                     pearling
-                                    minDistance={1000}
+                                    minDistance={750}
                                 />
 
                                 <div className="d-flex justify-content-between mt-2">
@@ -383,7 +396,7 @@ const Search = () => {
                                         return <div key={key} style={{ ...propsStyle, ...style }} {...restProps} />;
                                     }}
                                     min={1}
-                                    max={40}
+                                    max={30}
                                     step={2}
                                     value={[minimumDuration, maximumDuration]}
                                     onChange={([min, max]) => {
