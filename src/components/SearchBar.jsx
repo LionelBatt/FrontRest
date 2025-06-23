@@ -30,7 +30,7 @@ const SearchBar = ({ isInHeader = false }) => {
     try {
       const data = await CacheService.fetchWithCache(
         `search_${text}`,
-        `http://13.38.218.50:8080/travel/trips/search/text/${encodeURIComponent(text)}`,
+        `http://13.36.39.58:8080/travel/trips/search/text/${encodeURIComponent(text)}`,
         30 // TTL de 30 minutes
       );
 

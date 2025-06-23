@@ -37,7 +37,7 @@ const AccParam = () => {
             }
 
             try {
-                const response = await fetch('http://13.38.218.50:8080/travel/users/profil', {
+                const response = await fetch('http://13.36.39.58:8080/travel/users/profil', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -76,7 +76,7 @@ const AccParam = () => {
 
         setLoadingOrders(true);
         try {
-            const response = await fetch('http://13.38.218.50:8080/travel/orders/mine', {
+            const response = await fetch('http://13.36.39.58:8080/travel/orders/mine', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -138,7 +138,7 @@ const AccParam = () => {
         };
 
         try {
-            const response = await fetch('http://13.38.218.50:8080/travel/users/profil', {
+            const response = await fetch('http://13.36.39.58:8080/travel/users/profil', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -206,7 +206,7 @@ const AccParam = () => {
         const token = localStorage.getItem('token');
         
         try {
-            const response = await fetch(`http://13.38.218.50:8080/travel/orders/${selectedOrder.orderId}`, {
+            const response = await fetch(`http://13.36.39.58:8080/travel/orders/${selectedOrder.orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -249,7 +249,7 @@ const AccParam = () => {
         const token = localStorage.getItem('token');
         
         try {
-            const response = await fetch(`http://13.38.218.50:8080/travel/users/${userProfile.userId}`, {
+            const response = await fetch(`http://13.36.39.58:8080/travel/users/${userProfile.userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -344,7 +344,7 @@ const AccParam = () => {
             };
 
             const token = localStorage.getItem('token');
-            const response = await fetch('http://13.38.218.50:8080/travel/users/profil', {
+            const response = await fetch('http://13.36.39.58:8080/travel/users/profil', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

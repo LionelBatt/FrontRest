@@ -27,7 +27,7 @@ const Sidebar = ({ isOpen, onClose, onMouseEnter, onMouseLeave }) => {
       // GARDE LE CACHE pour les voyages par continent (données assez stables)
       const data = await CacheService.fetchWithCache(
         `trips_continent_${continent}`,
-        `http://13.38.218.50:8080/travel/trips/continent/${continent}`,
+        `http://13.36.39.58:8080/travel/trips/continent/${continent}`,
         120
       );
 

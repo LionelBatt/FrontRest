@@ -43,7 +43,7 @@ const FicheVoyage = () => {
                 setLoading(true);
                 
                 // Appel direct API sans cache pour les informations du voyage
-                const response = await fetch(`http://13.38.218.50:8080/travel/trips/${id || 1}`);
+                const response = await fetch(`http://13.36.39.58:8080/travel/trips/${id || 1}`);
                 const result = await response.json();
                 const data = result.data || result;
 
@@ -68,7 +68,7 @@ const FicheVoyage = () => {
             
             const options = await CacheService.fetchWithCache(
                 'all_travel_options',
-                'http://13.38.218.50:8080/travel/options',
+                'http://13.36.39.58:8080/travel/options',
                 60
             );
 

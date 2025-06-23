@@ -46,7 +46,7 @@ function CrudT() {
     }, []);
 
 
-    const BASE_URL = "http://13.38.218.50:8080/travel/trips";
+    const BASE_URL = "http://13.36.39.58:8080/travel/trips";
 
     const loadAll = async () => {
         try {

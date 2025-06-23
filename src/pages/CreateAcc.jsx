@@ -34,7 +34,7 @@ const CreateAcc = () => {
         setSuccess('');
 
         try {
-            const response = await fetch('http://13.38.218.50:8080/travel/auth/signup', {
+            const response = await fetch('http://13.36.39.58:8080/travel/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
